@@ -6,6 +6,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/auth/register", userRouter);
+app.use("/api/auth", userRouter);
 
 export default app;
