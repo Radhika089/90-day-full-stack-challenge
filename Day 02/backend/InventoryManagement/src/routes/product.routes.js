@@ -2,6 +2,8 @@ import express from "express";
 import {
   createProduct,
   deleteProduct,
+  getCategoryStats,
+  getDashboardStats,
   getLowStockProducts,
   getProducts,
   getSingleProduct,
@@ -12,10 +14,14 @@ import { authMiddleware, isAdmin } from "../middlewares/auth.middleware";
 const productRouter = express.Router();
 
 productRouter.post("/create", authMiddleware, isAdmin, createProduct);
-productRouter.put("/update/:id", authMiddleware, isAdmin, updateProduct);
+productRouter.patch("/update/:id", authMiddleware, isAdmin, updateProduct);
 productRouter.delete("/delete/:id", authMiddleware, isAdmin, deleteProduct);
+
 productRouter.get("/getProduct", authMiddleware, getProducts);
-productRouter.get("/getLowProduct", authMiddleware, getLowStockProducts);
 productRouter.get("/getSingleProduct/:id", authMiddleware, getSingleProduct);
+
+productRouter.get("/getLowProduct", authMiddleware, getLowStockProducts);
+productRouter.get("/dashboard", authMiddleware, getDashboardStats);
+productRouter.get("/category-stats", authMiddleware, getCategoryStats);
 
 export default productRouter;

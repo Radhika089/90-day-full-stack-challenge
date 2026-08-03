@@ -25,6 +25,7 @@ export async function createProduct(req, res) {
       description,
       price,
       stock,
+      createdBy: req.user._id,
     });
 
     return res.status(201).json({
@@ -42,12 +43,12 @@ export async function createProduct(req, res) {
 }
 
 export async function updateProduct(req, res) {
-  const { name, category, description, price, stock } = req.body;
+  // object keys gives/returns an array of the property name(keys)
 
-  if (!name || !category || !description || price == null || stock == null) {
+  if (Object.keys(req.body).length === 0) {
     return res.status(400).json({
       success: false,
-      message: "All fields are required!",
+      message: "No fields provided to update!",
     });
   }
 
@@ -56,7 +57,7 @@ export async function updateProduct(req, res) {
       {
         _id: req.params.id,
       },
-      { name, category, description, price, stock },
+      req.body,
       { new: true },
     );
 
@@ -154,7 +155,8 @@ export async function getProducts(req, res) {
       .find(query)
       .sort(sortOption)
       .limit(limit)
-      .skip(skip);
+      .skip(skip)
+      .populate("createdBy", "name email");
 
     const total = await productModel.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
@@ -178,7 +180,9 @@ export async function getProducts(req, res) {
 
 export async function getSingleProduct(req, res) {
   try {
-    const product = await productModel.findById(req.params.id);
+    const product = await productModel
+      .findById(req.params.id)
+      .populate("createdBy", "name email");
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -213,6 +217,80 @@ export async function getLowStockProducts(req, res) {
     return res.status(500).json({
       success: false,
       message: "Server Error",
+    });
+  }
+}
+
+export async function getDashboardStats(req, res) {
+  try {
+    const totalProducts = await productModel.countDocuments();
+
+    const lowStock = await productModel.countDocuments({
+      stock: { $lte: 5 },
+    });
+    const outOfStock = await productModel.countDocuments({
+      stock: { $eq: 0 },
+    });
+    const totalStockResult = await productModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalStock: {
+            $sum: "$stock",
+          },
+        },
+      },
+    ]);
+
+    const totalStock = totalStockResult[0]?.totalStock || 0;
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalProducts,
+        totalStock,
+        lowStock,
+        outOfStock,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function getCategoryStats(req, res) {
+  try {
+    const categories = await productModel.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          category: "$_id",
+          count: 1,
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      categories,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 }
