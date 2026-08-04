@@ -39,7 +39,7 @@ const navLinks = [
 ];
 const Sidebar = () => {
   return (
-    <aside className="w-72 min-h-screen bg-white border-r border-gray-200">
+    <aside className="w-72 sticky top-0 h-screen bg-white border-r border-gray-200">
       <div className="flex items-center justify-between px-6 py-5">
         <div className="flex items-center gap-3">
           <img src={logo} className="w-10 h-10 rounded-lg" />
