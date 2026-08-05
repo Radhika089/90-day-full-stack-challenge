@@ -1,5 +1,6 @@
 import { Search, Plus } from "lucide-react";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -14,10 +15,12 @@ const Header = () => {
           <p className="mt-2 text-gray-500">Manage your inventory products</p>
         </div>
 
-        <button className="flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800">
+        <Link
+          to={"/products/add"}
+          className="flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800">
           <Plus size={18} />
           Add Product
-        </button>
+        </Link>
       </div>
 
       {/* Filters */}

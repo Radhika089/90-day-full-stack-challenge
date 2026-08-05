@@ -7,6 +7,7 @@ import Categories from "./pages/Categories";
 import Orders from "./pages/Orders";
 import Settings from "./pages/Settings";
 import EditProduct from "./pages/EditProduct";
+import AddProduct from "./pages/AddProduct";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="orders" element={<Orders />} />
         <Route path="settings" element={<Settings />} />
         <Route path="/products/edit/:id" element={<EditProduct />} />
+        <Route path="/products/add" element={<AddProduct />} />
       </Route>
     </Routes>
   );
