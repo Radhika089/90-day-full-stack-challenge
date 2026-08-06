@@ -1,4 +1,5 @@
 import React from "react";
+import CharacterCounter from "./components/CharacterCounter";
 // import Toggle from "./components/Toggle";
 // import LiveInput from "./components/LiveInput";
 // import PasswordToggle from "./components/PasswordToggle";
@@ -10,7 +11,8 @@ const App = () => {
       {/* <Counter /> */}
       {/* <Toggle /> */}
       {/* <LiveInput /> */}
-      <PasswordToggle />
+      {/* <PasswordToggle /> */}
+      <CharacterCounter />
     </div>
   );
 };
