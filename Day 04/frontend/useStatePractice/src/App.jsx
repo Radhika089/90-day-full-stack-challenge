@@ -1,6 +1,5 @@
 import React from "react";
 import Product from "./components/Product";
-import Practice from "./components/Practice";
 // import CharacterCounter from "./components/CharacterCounter";
 // import Toggle from "./components/Toggle";
 // import LiveInput from "./components/LiveInput";
@@ -15,8 +14,7 @@ const App = () => {
       {/* <LiveInput /> */}
       {/* <PasswordToggle /> */}
       {/* <CharacterCounter /> */}
-      {/* <Product /> */}
-      <Practice />
+      <Product />
     </div>
   );
 };
