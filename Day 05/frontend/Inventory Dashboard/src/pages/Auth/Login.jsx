@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { loginUser } from "../../api/userApi";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const { login } = useAuth();
 
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
@@ -23,9 +25,14 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const data = await loginUser(formData);
+      const data = await login(formData);
       setMessage(data.message);
       setMessageType("success");
+
+      setFormData({
+        email: "",
+        password: "",
+      });
     } catch (error) {
       setMessage(error.response?.data?.message || "Login Failed");
       setMessageType("error");

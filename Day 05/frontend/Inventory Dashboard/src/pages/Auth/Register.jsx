@@ -38,6 +38,13 @@ const Register = () => {
 
       setMessage(data.message);
       setMessageType("success");
+
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
     } catch (error) {
       setMessage(error.response?.data?.message || "Registration failed");
       setMessageType("error");

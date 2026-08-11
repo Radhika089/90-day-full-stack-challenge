@@ -22,6 +22,12 @@ export async function registerUser(req, res) {
       message: "All fields are required!",
     });
   }
+  if (password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: "Password must be at least 6 characters",
+    });
+  }
 
   try {
     const existingUser = await userModel.findOne({ email });
