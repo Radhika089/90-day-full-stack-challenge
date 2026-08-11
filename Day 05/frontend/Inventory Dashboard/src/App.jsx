@@ -8,10 +8,14 @@ import Orders from "./pages/Orders";
 import Settings from "./pages/Settings";
 import EditProduct from "./pages/EditProduct";
 import AddProduct from "./pages/AddProduct";
+import Register from "./pages/Auth/Register";
+import Login from "./pages/Auth/Login";
 
 const App = () => {
   return (
     <Routes>
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Navigate to={"/dashboard"} replace />} />
         <Route path="dashboard" element={<Dashboard />} />

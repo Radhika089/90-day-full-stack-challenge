@@ -123,3 +123,14 @@ export async function logoutUser(req, res) {
     });
   }
 }
+
+export async function getCurrentUser(req, res) {
+  return res.status(200).json({
+    success: true,
+    user: {
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+    },
+  });
+}
