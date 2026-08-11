@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import logo from "../assets/logo.jpg";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const navLinks = [
   {
@@ -38,6 +39,8 @@ const navLinks = [
   },
 ];
 const Sidebar = () => {
+  const { logout } = useAuth();
+
   return (
     <aside className="w-72 sticky top-0 h-screen bg-white border-r border-gray-200">
       <div className="flex items-center justify-between px-6 py-5">
@@ -75,10 +78,12 @@ const Sidebar = () => {
       <div className="mx-5 my-8 border-t" />
 
       <div className="px-4 space-y-2">
-        <Link className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-100">
+        <button
+          onClick={logout}
+          className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-100">
           <Settings size={20} />
           Logout
-        </Link>
+        </button>
       </div>
     </aside>
   );

@@ -2,6 +2,7 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteProduct, getProducts } from "../../api/ProductApi";
+import { useAuth } from "../../context/AuthContext";
 
 const ProductsRender = () => {
   const [products, setProducts] = useState([]);
@@ -9,6 +10,9 @@ const ProductsRender = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === "Admin";
 
   const handleDelete = async (id) => {
     try {
@@ -167,17 +171,21 @@ const ProductsRender = () => {
                         <Eye size={18} />
                       </Link>
 
-                      <Link
-                        to={`/products/edit/${product._id}`}
-                        className="rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:bg-emerald-50 hover:text-emerald-600">
-                        <Pencil size={18} />
-                      </Link>
+                      {isAdmin && (
+                        <Link
+                          to={`/products/edit/${product._id}`}
+                          className="rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:bg-emerald-50 hover:text-emerald-600">
+                          <Pencil size={18} />
+                        </Link>
+                      )}
 
-                      <button
-                        onClick={() => handleDelete(product._id)}
-                        className="rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600">
-                        <Trash2 size={18} />
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDelete(product._id)}
+                          className="rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600">
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -47,3 +47,9 @@ export async function createProduct(data) {
   const response = await api.post("/product/create", data);
   return response.data;
 }
+
+//  Get single product by id
+export async function getSingleProduct(id) {
+  const response = await api.get(`/product/getSingleProduct/${id}`);
+  return response.data;
+}

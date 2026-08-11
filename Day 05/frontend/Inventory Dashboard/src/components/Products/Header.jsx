@@ -1,8 +1,13 @@
 import { Search, Plus } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const Header = () => {
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === "Admin";
+
   return (
     <div className="space-y-8">
       {/* Top Section */}
@@ -15,12 +20,14 @@ const Header = () => {
           <p className="mt-2 text-gray-500">Manage your inventory products</p>
         </div>
 
-        <Link
-          to={"/products/add"}
-          className="flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800">
-          <Plus size={18} />
-          Add Product
-        </Link>
+        {isAdmin && (
+          <Link
+            to={"/products/add"}
+            className="flex items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800">
+            <Plus size={18} />
+            Add Product
+          </Link>
+        )}
       </div>
 
       {/* Filters */}
