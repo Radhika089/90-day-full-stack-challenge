@@ -33,6 +33,10 @@ const Login = () => {
         email: "",
         password: "",
       });
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
     } catch (error) {
       setMessage(error.response?.data?.message || "Login Failed");
       setMessageType("error");
