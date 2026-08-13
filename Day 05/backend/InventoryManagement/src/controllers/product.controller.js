@@ -250,9 +250,10 @@ export async function getProducts(req, res) {
       .sort(sortOption)
       .skip(skip)
       .limit(pageLimit)
-      .populate("createdBy", "name email");
+      .populate("createdBy", "name email")
+      .populate("category", "name description active");
 
-    // PAGINATION INFO
+    // PAGINATION
     const total = await productModel.countDocuments(query);
 
     const totalPages = Math.ceil(total / pageLimit);
@@ -284,7 +285,8 @@ export async function getSingleProduct(req, res) {
   try {
     const product = await productModel
       .findById(req.params.id)
-      .populate("createdBy", "name email");
+      .populate("createdBy", "name email")
+      .populate("category", "name description active");
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -416,7 +418,9 @@ export async function getOutOfStockProducts(req, res) {
 
 export async function getProductsByCategory(req, res) {
   try {
-    const products = await productModel.find({ category: req.params.category });
+    const products = await productModel
+      .find({ category: req.params.category })
+      .populate("category", "name description active");
 
     return res.status(200).json({
       success: true,

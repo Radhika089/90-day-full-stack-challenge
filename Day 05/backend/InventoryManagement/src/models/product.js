@@ -8,10 +8,9 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      type: String,
-      trim: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: true,
-      enum: ["Electronics", "Clothing", "Furniture", "Food"],
     },
     price: {
       type: Number,
