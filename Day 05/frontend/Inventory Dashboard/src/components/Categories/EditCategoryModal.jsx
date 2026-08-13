@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import React from "react";
 
-const EditCategoryModal = ({ onClose }) => {
+const EditCategoryModal = ({ category, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full bg-white rounded-2xl shadow-xl max-w-md px-3">
@@ -32,6 +32,7 @@ const EditCategoryModal = ({ onClose }) => {
             <input
               type="text"
               placeholder="Electronic"
+              value={category.name}
               className="w-full border border-gray-300 outline-none px-4 py-3 rounded-xl placeholder:text-gray-400 focus:border-[#29b354]"
             />
           </div>
@@ -43,6 +44,7 @@ const EditCategoryModal = ({ onClose }) => {
 
             <textarea
               rows="4"
+              value={category.description}
               placeholder="Enter category description"
               className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-[#29b354]"
             />

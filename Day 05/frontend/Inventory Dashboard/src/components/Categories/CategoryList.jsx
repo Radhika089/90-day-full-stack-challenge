@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import EditCategoryModal from "./EditCategoryModal";
+import DeleteCategoryModal from "./DeleteCategoryModal";
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([
@@ -33,6 +35,12 @@ const CategoryList = () => {
     },
   ]);
 
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
   const toggleStatus = (id) => {
     setCategories((prevCategories) =>
       prevCategories.map((category) =>
@@ -44,13 +52,13 @@ const CategoryList = () => {
   };
 
   const handleEdit = (category) => {
-    console.log("Edit:", category);
+    setSelectedCategory(category);
+    setShowEditModal(true);
   };
 
-  const handleDelete = (id) => {
-    setCategories((prevCategories) =>
-      prevCategories.filter((category) => category.id !== id),
-    );
+  const handleDelete = (category) => {
+    setSelectedCategory(category);
+    setShowDeleteModal(true);
   };
 
   return (
@@ -141,7 +149,7 @@ const CategoryList = () => {
 
                     <button
                       type="button"
-                      onClick={() => handleDelete(category.id)}
+                      onClick={() => handleDelete(category)}
                       className="rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
                       title="Delete category">
                       <Trash2 size={18} />
@@ -153,6 +161,20 @@ const CategoryList = () => {
           </tbody>
         </table>
       </div>
+
+      {showEditModal && (
+        <EditCategoryModal
+          category={selectedCategory}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {showDeleteModal && (
+        <DeleteCategoryModal
+          category={selectedCategory}
+          onClose={() => setShowDeleteModal(false)}
+        />
+      )}
     </div>
   );
 };

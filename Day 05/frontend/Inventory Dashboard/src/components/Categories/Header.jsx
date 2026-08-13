@@ -1,8 +1,11 @@
 import { Plus, Search } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import AddCategoryModal from "./AddCategoryModal";
 
 const Header = () => {
+  const [showAddModal, setShowAddModal] = useState(false);
+
   return (
     <div className="space-y-8">
       {/* Top section */}
@@ -14,11 +17,12 @@ const Header = () => {
           <p className="text-gray-500 mt-2">Manage product categories</p>
         </div>
 
-        <Link
-          to={"/category/add"}
+        <button
+          type="button"
+          onClick={() => setShowAddModal(true)}
           className="flex items-center gap-2 bg-zinc-900 py-3 px-5 rounded-xl font-medium text-white text-sm transition hover:bg-zinc-800">
           <Plus size={18} /> Add Category
-        </Link>
+        </button>
       </div>
 
       {/* Filters */}
@@ -40,6 +44,10 @@ const Header = () => {
           <option value="oldest">Oldest</option>
         </select>
       </div>
+
+      {showAddModal && (
+        <AddCategoryModal onClose={() => setShowAddModal(false)} />
+      )}
     </div>
   );
 };
