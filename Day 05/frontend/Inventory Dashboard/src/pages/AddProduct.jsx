@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, UploadCloud } from "lucide-react";
 import { createProduct } from "../api/ProductApi";
+import { getCategories } from "../api/CategoryApi";
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const AddProduct = () => {
 
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,6 +33,19 @@ const AddProduct = () => {
       setMessageType("error");
     }
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data.categories);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -123,10 +138,13 @@ const AddProduct = () => {
                       name="category"
                       value={formData.category}
                       onChange={handleChange}>
-                      <option value="Electronics">Electronics</option>
-                      <option value="">Furniture</option>
-                      <option value="">Groceries</option>
-                      <option value="">Accessories</option>
+                      <option value="">Select Category</option>
+
+                      {categories.map((category) => (
+                        <option key={category._id} value={category._id}>
+                          {category.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>

@@ -122,7 +122,7 @@ const ProductTable = () => {
                 </td>
 
                 <td className="px-6 py-5 text-sm text-gray-600">
-                  {product.category}
+                  {product.category?.name}
                 </td>
 
                 <td className="px-6 py-5 font-medium text-gray-900">

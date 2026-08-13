@@ -264,7 +264,7 @@ const ProductsRender = () => {
                   {/* CATEGORY */}
 
                   <td className="px-6 py-5 text-gray-600">
-                    {product.category}
+                    {product.category?.name}
                   </td>
 
                   {/* PRICE */}
