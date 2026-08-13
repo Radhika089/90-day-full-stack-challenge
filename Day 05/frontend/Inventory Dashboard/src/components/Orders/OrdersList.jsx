@@ -205,12 +205,12 @@ const OrdersList = () => {
                       <Eye size={18} />
                     </Link>
 
-                    <button
-                      type="button"
+                    <Link
+                      to={`/orders/edit/${order.id}`}
                       title="Edit order"
                       className="rounded-xl border border-gray-200 p-2 text-gray-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600">
                       <Pencil size={18} />
-                    </button>
+                    </Link>
                   </div>
                 </td>
               </tr>

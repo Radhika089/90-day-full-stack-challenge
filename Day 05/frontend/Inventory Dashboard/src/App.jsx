@@ -14,6 +14,7 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import AdminRoute from "./components/Auth/AdminRoute";
 import ProductDetails from "./components/Products/ProductDetails";
 import OrderDetail from "./components/Orders/OrdersDetail";
+import EditOrder from "./components/Orders/EditOrder";
 
 const App = () => {
   return (
@@ -46,6 +47,7 @@ const App = () => {
             }
           />
           <Route path="orders/:id" element={<OrderDetail />} />
+          <Route path="orders/edit/:id" element={<EditOrder />} />
         </Route>
       </Route>
     </Routes>
