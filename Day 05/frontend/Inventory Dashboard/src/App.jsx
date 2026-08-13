@@ -13,6 +13,7 @@ import Login from "./pages/Auth/Login";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import AdminRoute from "./components/Auth/AdminRoute";
 import ProductDetails from "./components/Products/ProductDetails";
+import OrderDetail from "./components/Orders/OrdersDetail";
 
 const App = () => {
   return (
@@ -44,6 +45,7 @@ const App = () => {
               </AdminRoute>
             }
           />
+          <Route path="orders/:id" element={<OrderDetail />} />
         </Route>
       </Route>
     </Routes>
