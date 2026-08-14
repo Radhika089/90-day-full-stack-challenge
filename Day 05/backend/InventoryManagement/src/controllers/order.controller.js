@@ -178,9 +178,7 @@ export async function updateOrder(req, res) {
     const { id } = req.params;
 
     const {
-      customerName,
-      phone,
-      email,
+      customer,
       paymentMethod,
       paymentStatus,
       orderStatus,
@@ -190,9 +188,7 @@ export async function updateOrder(req, res) {
     const order = await OrderModel.findByIdAndUpdate(
       id,
       {
-        customerName,
-        phone,
-        email,
+        customer,
         paymentMethod,
         paymentStatus,
         orderStatus,
