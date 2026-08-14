@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, UploadCloud } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProductById, updateProduct } from "../api/ProductApi";
+import { getCategories } from "../api/CategoryApi";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -19,6 +20,8 @@ const EditProduct = () => {
   const [messageType, setMessageType] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [categories, setCategories] = useState([]);
+
   // Fetch single product
   useEffect(() => {
     const fetchProduct = async () => {
@@ -29,7 +32,7 @@ const EditProduct = () => {
           name: data.product.name || "",
           description: data.product.description || "",
           price: data.product.price || "",
-          category: data.product.category || "",
+          category: data.product.category?._id || "",
           stock: data.product.stock || "",
         });
       } catch (error) {
@@ -44,6 +47,19 @@ const EditProduct = () => {
 
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data.categories);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -222,10 +238,12 @@ const EditProduct = () => {
                     onChange={handleChange}
                     className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#29b354]">
                     <option value="">Select Category</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Furniture">Furniture</option>
-                    <option value="Groceries">Groceries</option>
-                    <option value="Accessories">Accessories</option>
+
+                    {categories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

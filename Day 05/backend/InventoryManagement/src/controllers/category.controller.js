@@ -46,7 +46,31 @@ export async function createCategory(req, res) {
 
 export async function getCategories(req, res) {
   try {
-    const categories = await CategoryModel.find();
+    const categories = await CategoryModel.aggregate([
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "category",
+          as: "products",
+        },
+      },
+      {
+        $addFields: {
+          products: { $size: "$products" },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          active: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          products: 1,
+        },
+      },
+    ]);
 
     return res.status(200).json({
       success: true,

@@ -3,6 +3,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import EditCategoryModal from "./EditCategoryModal";
 import DeleteCategoryModal from "./DeleteCategoryModal";
 import { getCategories } from "../../api/CategoryApi";
+import { updateCategory } from "../../api/CategoryApi";
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -31,14 +32,23 @@ const CategoryList = () => {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const toggleStatus = (id) => {
-    setCategories((prevCategories) =>
-      prevCategories.map((category) =>
-        category._id === id
-          ? { ...category, active: !category.active }
-          : category,
-      ),
-    );
+  const toggleStatus = async (category) => {
+    try {
+      const data = await updateCategory(category._id, {
+        active: !category.active,
+      });
+
+      setCategories((prevCategories) =>
+        prevCategories.map((item) =>
+          item._id === category._id ? data.category : item,
+        ),
+      );
+    } catch (error) {
+      console.log(error);
+      setError(
+        error.response?.data?.message || "Failed to update category status",
+      );
+    }
   };
 
   const handleEdit = (category) => {
@@ -97,7 +107,8 @@ const CategoryList = () => {
                   </td>
 
                   <td className="px-6 py-5 font-semibold text-gray-900">
-                    {category.name}
+                    {category.name.charAt(0).toUpperCase() +
+                      category.name.slice(1)}
                   </td>
 
                   <td className="px-6 py-5 text-gray-600">
@@ -108,7 +119,7 @@ const CategoryList = () => {
                   <td className="px-6 py-5">
                     <button
                       type="button"
-                      onClick={() => toggleStatus(category._id)}
+                      onClick={() => toggleStatus(category)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
                         category.active ? "bg-emerald-500" : "bg-gray-300"
                       }`}
@@ -129,7 +140,7 @@ const CategoryList = () => {
                   </td>
 
                   <td className="px-6 py-5 text-gray-600">
-                    {category.createdAt}
+                    {new Date(category.createdAt).toLocaleDateString("en-GB")}
                   </td>
 
                   {/* Actions */}
