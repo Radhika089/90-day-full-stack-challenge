@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -8,53 +8,104 @@ import {
   CreditCard,
   User,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const order = {
-  id: "ORD-1003",
-  customer: "Aman Kumar",
-  email: "aman@example.com",
-  phone: "+91 98765 43210",
-  status: "Shipped",
-  payment: "Paid",
-  paymentMethod: "UPI",
-  createdAt: "3 Aug 2026",
-  shippingAddress: {
-    address: "45 Model Town",
-    city: "Ludhiana",
-    state: "Punjab",
-    pincode: "141001",
-  },
-  items: [
-    {
-      id: 1,
-      name: "Wireless Headphones",
-      quantity: 1,
-      price: 2499,
-    },
-    {
-      id: 2,
-      name: "USB-C Cable",
-      quantity: 2,
-      price: 499,
-    },
-    {
-      id: 3,
-      name: "Wireless Mouse",
-      quantity: 1,
-      price: 1099,
-    },
-  ],
-};
+import { Link, useParams } from "react-router-dom";
+import { getOrderById } from "../../api/OrderApi";
 
 const OrderDetail = () => {
-  const subtotal = order.items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
+  const { id } = useParams();
 
-  const shipping = 100;
-  const total = subtotal + shipping;
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const data = await getOrderById(id);
+        setOrder(data.order);
+      } catch (error) {
+        console.log(error);
+        setError(error.response?.data?.message || "Failed to fetch order");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrder();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <p className="text-gray-500">Loading order...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600">
+        {error}
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6">
+        <p className="text-gray-500">Order not found.</p>
+      </div>
+    );
+  }
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "Pending":
+        return "bg-yellow-100 text-yellow-700";
+
+      case "Processing":
+        return "bg-blue-100 text-blue-700";
+
+      case "Shipped":
+        return "bg-purple-100 text-purple-700";
+
+      case "Delivered":
+        return "bg-emerald-100 text-emerald-700";
+
+      case "Cancelled":
+        return "bg-red-100 text-red-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getPaymentClass = (status) => {
+    switch (status) {
+      case "Paid":
+        return "bg-emerald-100 text-emerald-700";
+
+      case "Pending":
+        return "bg-yellow-100 text-yellow-700";
+
+      case "Failed":
+        return "bg-red-100 text-red-700";
+
+      case "Refunded":
+        return "bg-purple-100 text-purple-700";
+
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -69,24 +120,29 @@ const OrderDetail = () => {
 
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              View complete order information
-            </p>
+
+            <p className="mt-1 text-sm text-gray-500">{order.orderId}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-semibold text-purple-700">
-            {order.status}
+          <span
+            className={`rounded-full px-4 py-2 text-sm font-semibold ${getStatusClass(
+              order.orderStatus,
+            )}`}>
+            {order.orderStatus}
           </span>
 
-          <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700">
-            {order.payment}
+          <span
+            className={`rounded-full px-4 py-2 text-sm font-semibold ${getPaymentClass(
+              order.paymentStatus,
+            )}`}>
+            {order.paymentStatus}
           </span>
         </div>
       </div>
 
-      {/* Order  */}
+      {/* Customer / Payment / Shipping */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Customer */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -97,6 +153,7 @@ const OrderDetail = () => {
 
             <div>
               <h2 className="font-semibold text-gray-900">Customer</h2>
+
               <p className="text-sm text-gray-500">Customer information</p>
             </div>
           </div>
@@ -105,18 +162,22 @@ const OrderDetail = () => {
             <p>
               <span className="text-gray-500">Name:</span>{" "}
               <span className="font-medium text-gray-900">
-                {order.customer}
+                {order.customer.name}
               </span>
             </p>
 
             <p>
               <span className="text-gray-500">Email:</span>{" "}
-              <span className="font-medium text-gray-900">{order.email}</span>
+              <span className="font-medium text-gray-900">
+                {order.customer.email || "N/A"}
+              </span>
             </p>
 
             <p>
               <span className="text-gray-500">Phone:</span>{" "}
-              <span className="font-medium text-gray-900">{order.phone}</span>
+              <span className="font-medium text-gray-900">
+                {order.customer.phone}
+              </span>
             </p>
           </div>
         </div>
@@ -130,6 +191,7 @@ const OrderDetail = () => {
 
             <div>
               <h2 className="font-semibold text-gray-900">Payment</h2>
+
               <p className="text-sm text-gray-500">Payment information</p>
             </div>
           </div>
@@ -138,7 +200,7 @@ const OrderDetail = () => {
             <p>
               <span className="text-gray-500">Status:</span>{" "}
               <span className="font-medium text-emerald-600">
-                {order.payment}
+                {order.paymentStatus}
               </span>
             </p>
 
@@ -152,7 +214,7 @@ const OrderDetail = () => {
             <p>
               <span className="text-gray-500">Order Date:</span>{" "}
               <span className="font-medium text-gray-900">
-                {order.createdAt}
+                {formatDate(order.createdAt)}
               </span>
             </p>
           </div>
@@ -167,16 +229,13 @@ const OrderDetail = () => {
 
             <div>
               <h2 className="font-semibold text-gray-900">Shipping Address</h2>
+
               <p className="text-sm text-gray-500">Delivery information</p>
             </div>
           </div>
 
           <div className="text-sm leading-6 text-gray-600">
-            <p>{order.shippingAddress.address}</p>
-            <p>
-              {order.shippingAddress.city}, {order.shippingAddress.state}
-            </p>
-            <p>{order.shippingAddress.pincode}</p>
+            <p>{order.shippingAddress}</p>
           </div>
         </div>
       </div>
@@ -190,8 +249,10 @@ const OrderDetail = () => {
 
           <div>
             <h2 className="font-semibold text-gray-900">Ordered Products</h2>
+
             <p className="text-sm text-gray-500">
-              {order.items.length} products in this order
+              {order.items.length}{" "}
+              {order.items.length === 1 ? "product" : "products"} in this order
             </p>
           </div>
         </div>
@@ -221,18 +282,20 @@ const OrderDetail = () => {
             <tbody>
               {order.items.map((item) => (
                 <tr
-                  key={item.id}
+                  key={item.product._id}
                   className="border-b border-gray-100 last:border-0 hover:bg-slate-50">
                   <td className="px-6 py-5 font-medium text-gray-900">
-                    {item.name}
+                    {item.product.name}
                   </td>
 
-                  <td className="px-6 py-5 text-gray-600">₹{item.price}</td>
+                  <td className="px-6 py-5 text-gray-600">
+                    ₹{item.price.toLocaleString("en-IN")}
+                  </td>
 
                   <td className="px-6 py-5 text-gray-600">{item.quantity}</td>
 
                   <td className="px-6 py-5 text-right font-medium text-gray-900">
-                    ₹{item.price * item.quantity}
+                    ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                   </td>
                 </tr>
               ))}
@@ -241,7 +304,7 @@ const OrderDetail = () => {
         </div>
       </div>
 
-      {/* Bottom  */}
+      {/* Bottom */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Timeline */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -253,36 +316,76 @@ const OrderDetail = () => {
 
               <div>
                 <p className="font-medium text-gray-900">Order Placed</p>
-                <p className="text-sm text-gray-500">3 Aug 2026</p>
+
+                <p className="text-sm text-gray-500">
+                  {formatDate(order.createdAt)}
+                </p>
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <CheckCircle2 className="text-emerald-500" size={22} />
+            {order.orderStatus !== "Pending" &&
+              order.orderStatus !== "Cancelled" && (
+                <div className="flex gap-4">
+                  <CheckCircle2 className="text-emerald-500" size={22} />
 
-              <div>
-                <p className="font-medium text-gray-900">Processing</p>
-                <p className="text-sm text-gray-500">3 Aug 2026</p>
+                  <div>
+                    <p className="font-medium text-gray-900">Processing</p>
+
+                    <p className="text-sm text-gray-500">
+                      Order is being processed
+                    </p>
+                  </div>
+                </div>
+              )}
+
+            {(order.orderStatus === "Shipped" ||
+              order.orderStatus === "Delivered") && (
+              <div className="flex gap-4">
+                <CheckCircle2 className="text-purple-500" size={22} />
+
+                <div>
+                  <p className="font-medium text-gray-900">Shipped</p>
+
+                  <p className="text-sm text-gray-500">
+                    Order has been shipped
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="flex gap-4">
-              <CheckCircle2 className="text-purple-500" size={22} />
+            {order.orderStatus === "Delivered" ? (
+              <div className="flex gap-4">
+                <CheckCircle2 className="text-emerald-500" size={22} />
 
-              <div>
-                <p className="font-medium text-gray-900">Shipped</p>
-                <p className="text-sm text-gray-500">4 Aug 2026</p>
+                <div>
+                  <p className="font-medium text-gray-900">Delivered</p>
+
+                  <p className="text-sm text-gray-500">
+                    Order delivered successfully
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : order.orderStatus !== "Cancelled" ? (
+              <div className="flex gap-4">
+                <Clock3 className="text-gray-400" size={22} />
 
-            <div className="flex gap-4">
-              <Clock3 className="text-gray-400" size={22} />
+                <div>
+                  <p className="font-medium text-gray-400">Delivered</p>
 
-              <div>
-                <p className="font-medium text-gray-400">Delivered</p>
-                <p className="text-sm text-gray-400">Pending</p>
+                  <p className="text-sm text-gray-400">Pending</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex gap-4">
+                <Clock3 className="text-red-400" size={22} />
+
+                <div>
+                  <p className="font-medium text-red-500">Cancelled</p>
+
+                  <p className="text-sm text-gray-400">Order was cancelled</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -292,13 +395,19 @@ const OrderDetail = () => {
 
           <div className="space-y-4 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Subtotal</span>
-              <span className="font-medium text-gray-900">₹{subtotal}</span>
+              <span className="text-gray-500">Total Items</span>
+
+              <span className="font-medium text-gray-900">
+                {order.items.reduce((total, item) => total + item.quantity, 0)}
+              </span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-gray-500">Shipping</span>
-              <span className="font-medium text-gray-900">₹{shipping}</span>
+              <span className="text-gray-500">Total Amount</span>
+
+              <span className="font-medium text-gray-900">
+                ₹{order.totalAmount.toLocaleString("en-IN")}
+              </span>
             </div>
 
             <div className="border-t border-gray-200 pt-4">
@@ -308,7 +417,7 @@ const OrderDetail = () => {
                 </span>
 
                 <span className="text-lg font-bold text-gray-900">
-                  ₹{total}
+                  ₹{order.totalAmount.toLocaleString("en-IN")}
                 </span>
               </div>
             </div>

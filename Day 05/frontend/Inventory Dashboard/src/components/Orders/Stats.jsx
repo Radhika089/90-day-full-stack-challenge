@@ -8,11 +8,25 @@ import {
 } from "lucide-react";
 import React from "react";
 
-const Stats = () => {
+const Stats = ({ orders = [] }) => {
+  const totalOrders = orders.length;
+
+  const pendingOrders = orders.filter(
+    (order) => order.orderStatus === "Pending",
+  ).length;
+
+  const completedOrders = orders.filter(
+    (order) => order.orderStatus === "Delivered",
+  ).length;
+
+  const cancelledOrders = orders.filter(
+    (order) => order.orderStatus === "Cancelled",
+  ).length;
+
   const stats = [
     {
       title: "Total Orders",
-      value: 248,
+      value: totalOrders,
       change: "12.5%",
       trend: "up",
       icon: ShoppingCart,
@@ -22,7 +36,7 @@ const Stats = () => {
     },
     {
       title: "Pending Orders",
-      value: 32,
+      value: pendingOrders,
       change: "8.2%",
       trend: "up",
       icon: Clock3,
@@ -32,7 +46,7 @@ const Stats = () => {
     },
     {
       title: "Completed Orders",
-      value: 196,
+      value: completedOrders,
       change: "15.4%",
       trend: "up",
       icon: CircleCheck,
@@ -42,7 +56,7 @@ const Stats = () => {
     },
     {
       title: "Cancelled Orders",
-      value: 20,
+      value: cancelledOrders,
       change: "3.1%",
       trend: "down",
       icon: CircleX,
