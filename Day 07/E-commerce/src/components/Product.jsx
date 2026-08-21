@@ -2,58 +2,83 @@ import React from "react";
 import { Heart, ShoppingBag, Star } from "lucide-react";
 
 const Product = ({ product }) => {
-  const discountedPrice =
-    product.price - (product.price * product.discountPercentage) / 100;
+  const discount = product.discountPercentage || 0;
+
+  const discountedPrice = product.price - (product.price * discount) / 100;
 
   return (
-    <div className="group w-72 overflow-hidden rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
-      <div className="relative h-80 overflow-hidden bg-gray-50">
-        {/* Discount */}
-        <span className="absolute top-4 left-4 z-10 rounded-full bg-black px-3 py-1 text-xs font-medium text-white">
-          -{Math.round(product.discountPercentage)}%
-        </span>
+    <div className="group">
+      {/* Image Card */}
+      <div className="relative overflow-hidden rounded-[28px] bg-[#f3efe7]">
+        {/* Badge */}
+        {discount > 0 && (
+          <div className="absolute left-4 top-4 z-10 rounded-full bg-[#6b4226] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white">
+            SAVE {discount}%
+          </div>
+        )}
 
         {/* Wishlist */}
-        <button className="absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm hover:bg-black hover:text-white transition">
-          <Heart size={17} strokeWidth={1.8} />
+        <button className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#3b2a20] shadow-sm backdrop-blur transition-all duration-300 hover:bg-[#3b2a20] hover:text-white">
+          <Heart size={17} strokeWidth={1.7} />
         </button>
 
-        <img
-          src={product?.images?.[0]}
-          alt={product?.title}
-          className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-110"
-        />
-      </div>
-
-      <div className="p-5">
-        <p className="mb-1 text-xs uppercase tracking-wider text-gray-400">
-          {product.category}
-        </p>
-
-        <h2 className="line-clamp-1 text-base font-semibold text-gray-900">
-          {product.title}
-        </h2>
-
-        <div className="mt-2 flex items-center gap-1">
-          <Star size={15} fill="currentColor" className="text-yellow-400" />
-
-          <span className="text-sm text-gray-500">{product.rating}</span>
+        {/* Image */}
+        <div className="flex h-[280px] items-center justify-center overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          />
         </div>
 
+        {/* Add to Cart */}
+        <div className="absolute bottom-4 left-4 right-4 translate-y-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#2d211b] py-3.5 text-sm font-medium text-white shadow-lg transition hover:bg-[#4a3021]">
+            <ShoppingBag size={17} />
+            Add to cart
+          </button>
+        </div>
+      </div>
+
+      {/* Product Info */}
+      <div className="px-1 pt-4">
+        {/* Category + Rating */}
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#a0836b]">
+            {product.category}
+          </p>
+
+          <div className="flex items-center gap-1">
+            <Star size={13} fill="currentColor" className="text-[#c7924b]" />
+
+            <span className="text-xs font-medium text-[#6d625b]">
+              {product.rating}
+            </span>
+          </div>
+        </div>
+
+        {/* Name */}
+        <h3 className="mt-2 text-[17px] font-semibold tracking-tight text-[#2d211b] transition-colors group-hover:text-[#8b5e3c]">
+          {product.name}
+        </h3>
+
+        {/* Description */}
+        <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-[#92857b]">
+          {product.description}
+        </p>
+
+        {/* Price */}
         <div className="mt-3 flex items-center gap-2">
-          <span className="text-lg font-bold text-gray-900">
+          <span className="text-lg font-bold text-[#2d211b]">
             ${discountedPrice.toFixed(2)}
           </span>
 
-          <span className="text-sm text-gray-400 line-through">
-            ${product.price}
-          </span>
+          {discount > 0 && (
+            <span className="text-sm text-[#a89b91] line-through">
+              ${product.price.toFixed(2)}
+            </span>
+          )}
         </div>
-
-        <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3 text-sm font-medium text-white hover:bg-gray-800 transition">
-          <ShoppingBag size={17} />
-          Add to Cart
-        </button>
       </div>
     </div>
   );
