@@ -1771,3 +1771,5 @@ const ProductList = [
       "https://cdn.dummyjson.com/product-images/groceries/kiwi/thumbnail.webp",
   },
 ];
+
+export default ProductList;
