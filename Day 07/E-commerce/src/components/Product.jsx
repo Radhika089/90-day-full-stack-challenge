@@ -8,9 +8,7 @@ const Product = ({ product }) => {
 
   return (
     <div className="group">
-      {/* Image Card */}
       <div className="relative overflow-hidden rounded-[28px] bg-[#f3efe7]">
-        {/* Badge */}
         {discount > 0 && (
           <div className="absolute left-4 top-4 z-10 rounded-full bg-[#6b4226] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white">
             SAVE {discount}%
@@ -40,9 +38,7 @@ const Product = ({ product }) => {
         </div>
       </div>
 
-      {/* Product Info */}
       <div className="px-1 pt-4">
-        {/* Category + Rating */}
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#a0836b]">
             {product.category}

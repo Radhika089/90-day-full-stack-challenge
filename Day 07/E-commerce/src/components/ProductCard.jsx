@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Product from "./Product";
 import products from "../utils/constant";
 import { ArrowRight, SlidersHorizontal } from "lucide-react";
+import Skelton from "./Skelton";
 
 const ProductCard = () => {
-  const [listProduct, setListProduct] = useState(products);
+  const [listProduct, setListProduct] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
 
+  useEffect(() => {
+    filterProduct();
+  }, [products]);
+
   const filterProduct = () => {
-    setListProduct(products.filter((product) => product.rating >= 4.7));
+    setListProduct(
+      products.filter((product) => product.rating >= 4.7).slice(0, 4),
+    );
     setActiveFilter("top");
   };
 
@@ -17,7 +24,9 @@ const ProductCard = () => {
     setActiveFilter("all");
   };
 
-  return (
+  return listProduct.length === 0 ? (
+    <Skelton />
+  ) : (
     <section className="bg-[#fdfbf7] px-5 py-16 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
