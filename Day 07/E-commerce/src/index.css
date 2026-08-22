@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+body {
+  font-family: "DM Sans", sans-serif;
+}
+.aura-hero-swiper .swiper-pagination {
+  bottom: 20px;
+}
+
+.aura-hero-swiper .swiper-pagination-bullet {
+  width: 7px;
+  height: 7px;
+  margin: 0 4px !important;
+  background: #e8dcc8;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.aura-hero-swiper .swiper-pagination-bullet-active {
+  width: 24px;
+  border-radius: 999px;
+  opacity: 1;
+}
