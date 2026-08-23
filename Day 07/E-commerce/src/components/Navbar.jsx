@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, ShoppingBag, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const navItems = ["Shop", "Brews", "Gear", "Subscribe", "About"];
@@ -16,12 +17,12 @@ const Navbar = () => {
 
         <div className="flex items-center hidden md:flex gap-8">
           {navItems.map((item) => (
-            <a
-              href="#"
+            <Link
+              to={`${item.toLowerCase()}`}
               className="text-sm font-medium hover:text-gray-300"
               key={item}>
               {item}
-            </a>
+            </Link>
           ))}
         </div>
 
