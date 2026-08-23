@@ -2,7 +2,7 @@ const products = [
   {
     id: 1,
     name: "Ethiopian Yirgacheffe",
-    category: "Whole Bean",
+    category: "brews",
     price: 18.0,
     rating: 4.8,
     reviews: 124,
@@ -14,7 +14,7 @@ const products = [
   {
     id: 2,
     name: "Colombian Supremo",
-    category: "Whole Bean",
+    category: "brews",
     price: 17.0,
     rating: 4.7,
     reviews: 98,
@@ -26,7 +26,7 @@ const products = [
   {
     id: 3,
     name: "House Blend",
-    category: "Whole Bean",
+    category: "brews",
     price: 16.0,
     rating: 4.9,
     reviews: 186,
@@ -38,7 +38,7 @@ const products = [
   {
     id: 4,
     name: "Brazilian Santos",
-    category: "Whole Bean",
+    category: "brews",
     price: 17.5,
     rating: 4.6,
     reviews: 76,
@@ -50,7 +50,7 @@ const products = [
   {
     id: 5,
     name: "Kenyan AA",
-    category: "Whole Bean",
+    category: "brews",
     price: 21.0,
     rating: 4.9,
     reviews: 91,
@@ -62,7 +62,7 @@ const products = [
   {
     id: 6,
     name: "Midnight Roast",
-    category: "Whole Bean",
+    category: "brews",
     price: 19.0,
     rating: 4.7,
     reviews: 112,
