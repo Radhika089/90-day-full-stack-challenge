@@ -1,9 +1,16 @@
 import React from "react";
 import { ArrowLeft, Heart, Minus, Plus, ShoppingBag, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import products from "../utils/constant";
 
 const ProductDetails = () => {
-  return (
+  const { productId } = useParams();
+
+  const product = products.find((product) => product.id === Number(productId));
+
+  return !product ? (
+    "Not Found"
+  ) : (
     <div className="bg-[#fdfbf7] px-5 py-12 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <Link
@@ -16,19 +23,19 @@ const ProductDetails = () => {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
           <div className="overflow-hidden bg-[#f1ece5]">
             <img
-              src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=1200&q=80"
-              alt="Ethiopian Yirgacheffe"
+              src={product.image}
+              alt={product.name}
               className="h-[500px] w-full object-cover sm:h-[600px]"
             />
           </div>
 
           <div className="flex flex-col justify-center">
             <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#9a7658]">
-              Whole Bean
+              {product.category}
             </p>
 
             <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-[#2d211b] sm:text-5xl">
-              Ethiopian Yirgacheffe
+              {product.name}
             </h1>
 
             <div className="mt-5 flex items-center gap-3">
@@ -38,18 +45,22 @@ const ProductDetails = () => {
                   fill="currentColor"
                   className="text-[#9a7658]"
                 />
-                <span className="text-sm font-medium text-[#4c4038]">4.8</span>
+                <span className="text-sm font-medium text-[#4c4038]">
+                  {product.rating}{" "}
+                </span>
               </div>
 
-              <span className="text-sm text-[#9d9289]">124 reviews</span>
+              <span className="text-sm text-[#9d9289]">
+                {product.reviews} reviews
+              </span>
             </div>
 
-            <p className="mt-6 text-2xl font-medium text-[#2d211b]">$18.00</p>
+            <p className="mt-6 text-2xl font-medium text-[#2d211b]">
+              ${product.price.toFixed(2)}
+            </p>
 
             <p className="mt-6 max-w-lg text-[15px] leading-7 text-[#81766e]">
-              A bright and floral coffee with delicate citrus and honey
-              sweetness. Carefully selected and roasted to bring out its
-              naturally vibrant character.
+              {product.description}
             </p>
 
             <div className="my-8 h-px bg-[#e8e0d8]" />
@@ -91,7 +102,7 @@ const ProductDetails = () => {
                   Roast
                 </p>
                 <p className="mt-1 text-sm font-medium text-[#40352f]">
-                  Medium
+                  {product.roast}
                 </p>
               </div>
 
@@ -100,7 +111,7 @@ const ProductDetails = () => {
                   Origin
                 </p>
                 <p className="mt-1 text-sm font-medium text-[#40352f]">
-                  Ethiopia
+                  {product.origin}
                 </p>
               </div>
             </div>
