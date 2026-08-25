@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import LoginLeft from "../components/Auth/LoginLeft";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2Icon } from "lucide-react";
+import { useAppContext } from "../context/AppContext";
 
 const Auth = ({ mode }) => {
+  const { login, register } = useAppContext();
+  const navigate = useNavigate();
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
@@ -12,6 +16,31 @@ const Auth = ({ mode }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const isLogin = mode === "login";
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      if (mode === "login") {
+        await login(email, password);
+      } else {
+        await register(name, email, password);
+      }
+      navigate("/");
+    } catch (err) {
+      setError(
+        err.message ||
+          (mode === "login"
+            ? "Invalid email or password"
+            : "Registration Failed"),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex bg-white text-zinc-900 min-h-screen font-sans">
       <LoginLeft />
@@ -35,7 +64,7 @@ const Auth = ({ mode }) => {
             </div>
           )}
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {!isLogin && (
               <div>
                 <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-widest mb-2">
@@ -85,7 +114,7 @@ const Auth = ({ mode }) => {
               </div>
 
               <button
-                type="button"
+                type="submit"
                 disabled={loading}
                 className="w-full py-2.5 bg-linear-to-br from-red-600 to-amber-600 text-white font-semibold hover:scale-102 disabled:opacity-40 flex items-center justify-center cursor-pointer rounded-lg mt-2 transition-all">
                 {loading && (
