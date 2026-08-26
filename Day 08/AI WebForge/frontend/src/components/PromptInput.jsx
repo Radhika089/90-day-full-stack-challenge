@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRightIcon,
   CloudUploadIcon,
@@ -45,7 +45,7 @@ const PromptInput = ({
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => e.target.value}
+          onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={loading}
           placeholder={placeholder}
@@ -87,12 +87,12 @@ const PromptInput = ({
       <textarea
         ref={textareaRef}
         value={value}
-        onChange={(e) => e.target.value}
+        onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         disabled={loading}
         placeholder={placeholder}
         rows={large ? 5 : 1}
-        className={`flex-1 bg-transparent border-none outline-none resize-none text-zinc-900 placeholder:text-zinc-400 ${larger ? "text-base" : "text-sm"}`}
+        className={`flex-1 bg-transparent border-none outline-none resize-none text-zinc-900 placeholder:text-zinc-400 ${large ? "text-base" : "text-sm"}`}
       />
 
       <button

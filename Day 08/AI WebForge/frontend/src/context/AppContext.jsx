@@ -7,7 +7,7 @@ import {
 } from "react";
 import api from "../api/api";
 import toast from "react-hot-toast";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const AppContext = createContext(undefined);
 
@@ -20,7 +20,7 @@ export const AppProvider = ({ children }) => {
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [activeProject, setActiveProject] = useState(null);
-  const [LoadingActiveProjects, setLoadingActiveProjects] = useState(true);
+  const [loadingActiveProject, setLoadingActiveProject] = useState(true);
   const [chatLoading, setChatLoading] = useState(false);
   const [generatingProject, setGeneratingProject] = useState(false);
   const [activeFile, setActiveFile] = useState("/App.js");
@@ -103,7 +103,7 @@ export const AppProvider = ({ children }) => {
 
   const loadProject = async (id, silent = false) => {
     if (!user) return;
-    if (!silent) setLoadingActiveProjects(true);
+    if (!silent) setLoadingActiveProject(true);
 
     try {
       const { data } = await api.get(`/api/projects/${id}`);
@@ -125,7 +125,7 @@ export const AppProvider = ({ children }) => {
         navigate("/");
       }
     } finally {
-      if (!silent) setLoadingActiveProjects(false);
+      if (!silent) setLoadingActiveProject(false);
     }
   };
 
@@ -151,7 +151,6 @@ export const AppProvider = ({ children }) => {
   const handleGenerate = useCallback(
     async (prompt) => {
       if (!user) return;
-
       setGeneratingProject(true);
 
       try {
@@ -194,7 +193,7 @@ export const AppProvider = ({ children }) => {
         projects,
         loadingProjects,
         activeProject,
-        LoadingActiveProjects,
+        loadingActiveProject,
         chatLoading,
         generatingProject,
         activeFile,
