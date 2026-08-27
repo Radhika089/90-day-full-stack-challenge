@@ -183,6 +183,32 @@ export const AppProvider = ({ children }) => {
     [user],
   );
 
+  const handleChat = useCallback(
+    async (prompt) => {
+      if (!activeProject || !user) return;
+      setChatLoading(true);
+
+      try {
+        const { data } = await api.posy(
+          `/api/projects/${activeProject._id}/chat`,
+          { prompt },
+        );
+        setActiveProject(data);
+        if (data.errors && data.errors.length > 0) {
+          toast.error(`${data.errors.length} revision patches failed`);
+        } else {
+          toast.success(`Updated to version ${data.version}`);
+        }
+      } catch (err) {
+        console.error("Revision request failed", err);
+        toast.error(err?.response?.data?.error || "Revision request failed");
+      } finally {
+        setChatLoading(false);
+      }
+    },
+    [activeProject, user],
+  );
+
   return (
     <AppContext.Provider
       value={{
@@ -198,6 +224,7 @@ export const AppProvider = ({ children }) => {
         generatingProject,
         activeFile,
         showCode,
+        handleChat,
         setActiveFile,
         setShowCode,
         loadProject,

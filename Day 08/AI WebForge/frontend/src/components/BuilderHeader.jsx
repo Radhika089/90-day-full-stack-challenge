@@ -1,4 +1,12 @@
-import { ArrowLeftIcon, Code2Icon, EyeIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  Code2Icon,
+  DownloadIcon,
+  ExternalLinkIcon,
+  EyeIcon,
+  GlobeIcon,
+  Loader2Icon,
+} from "lucide-react";
 import React from "react";
 
 const BuilderHeader = ({
@@ -7,6 +15,7 @@ const BuilderHeader = ({
   showCode,
   onToggleShowCode,
   onPublish,
+  publishing,
   onOpenPreview,
   onDownload,
   onBack,
@@ -32,7 +41,7 @@ const BuilderHeader = ({
       <div className="flex items-center gap-1.5">
         <button
           onClick={onToggleShowCode}
-          className={`inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 text-zinc-200 hover:bg-zinc-100 hover:text-zinc-900 text-sm font-medium rounded-lg cursor-pointer bg-white ${showCode ? "bg-zinc-100 text-zinc-900" : ""}`}>
+          className={`inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 text-sm font-medium rounded-lg cursor-pointer bg-white ${showCode ? "bg-zinc-100 text-zinc-900" : ""}`}>
           {showCode ? (
             <>
               <EyeIcon size={13} />
@@ -47,7 +56,33 @@ const BuilderHeader = ({
         </button>
         <button
           onClick={onOpenPreview}
-          className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 text-sm font-medium rounded-lg bg-white"></button>
+          className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 text-sm font-medium rounded-lg bg-white">
+          <ExternalLinkIcon size={13} /> Open Preview
+        </button>
+
+        <button
+          onClick={onPublish}
+          disabled={publishing}
+          className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 text-xs font-medium rounded-lg cursor-pointer bg-white">
+          {publishing ? (
+            <Loader2Icon size={13} className="animate-spin" />
+          ) : (
+            <GlobeIcon size={13} />
+          )}{" "}
+          Publish
+        </button>
+
+        <button
+          onClick={onDownload}
+          className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 text-xs font-medium rounded-lg cursor-pointer bg-white">
+          <DownloadIcon size={13} /> Export
+        </button>
+
+        <button
+          onClick={onLogout}
+          className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 text-xs font-medium rounded-lg cursor-pointer bg-white">
+          Sign Out
+        </button>
       </div>
     </header>
   );
