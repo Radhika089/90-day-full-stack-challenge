@@ -6,6 +6,7 @@ import BuilderHeader from "../components/BuilderHeader";
 import { FolderTreeIcon, MessageSquareIcon } from "lucide-react";
 import ChatPanel from "../components/ChatPanel";
 import FileExplorer from "../components/FileExplorer";
+import PreviewPanel from "../components/PreviewPanel";
 
 const Builder = () => {
   const { id } = useParams();
@@ -122,7 +123,11 @@ const Builder = () => {
           activeProject.status === "failed" ? (
             <Loading />
           ) : (
-            <p>Preview Panel</p>
+            <PreviewPanel
+              project={activeProject}
+              activeFile={activeFile}
+              showCode={showCode}
+            />
           )}
         </div>
       </div>

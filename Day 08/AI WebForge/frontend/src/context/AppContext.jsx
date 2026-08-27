@@ -1,13 +1,15 @@
-import {
+import React, {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useEffect,
   useState,
 } from "react";
 import api from "../api/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import debounce from "lodash.debounce";
 
 const AppContext = createContext(undefined);
 
@@ -189,7 +191,7 @@ export const AppProvider = ({ children }) => {
       setChatLoading(true);
 
       try {
-        const { data } = await api.posy(
+        const { data } = await api.post(
           `/api/projects/${activeProject._id}/chat`,
           { prompt },
         );
@@ -209,9 +211,31 @@ export const AppProvider = ({ children }) => {
     [activeProject, user],
   );
 
+  const debouncedSave = useMemo(
+    () =>
+      debounce(async (files, id) => {
+        try {
+          await api.put(`/api/projects/${id}/files`, { files });
+        } catch (err) {
+          console.error("Failed to auto-save files:", err);
+          toast.error("Failed to save code modifications.");
+        }
+      }, 1000),
+    [],
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, [debouncedSave]);
+
   const updateProjectFiles = useCallback(
-    async (params) => {},
-    [activeProject, user],
+    async (files) => {
+      if (!activeProject || !user) return;
+      debouncedSave(files, activeProject._id);
+    },
+    [activeProject, user, debouncedSave],
   );
 
   return (
@@ -237,6 +261,7 @@ export const AppProvider = ({ children }) => {
         handleGenerate,
         handleDelete,
         logout,
+        updateProjectFiles,
       }}>
       {children}
     </AppContext.Provider>
