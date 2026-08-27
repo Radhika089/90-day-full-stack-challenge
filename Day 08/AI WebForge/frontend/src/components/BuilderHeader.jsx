@@ -50,7 +50,7 @@ const BuilderHeader = ({
           ) : (
             <>
               <Code2Icon size={13} />
-              Preview
+              Code
             </>
           )}
         </button>
