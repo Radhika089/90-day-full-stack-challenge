@@ -209,6 +209,11 @@ export const AppProvider = ({ children }) => {
     [activeProject, user],
   );
 
+  const updateProjectFiles = useCallback(
+    async (params) => {},
+    [activeProject, user],
+  );
+
   return (
     <AppContext.Provider
       value={{
