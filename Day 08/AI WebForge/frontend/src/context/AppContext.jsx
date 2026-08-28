@@ -262,6 +262,7 @@ export const AppProvider = ({ children }) => {
         handleDelete,
         logout,
         updateProjectFiles,
+        handleChat,
       }}>
       {children}
     </AppContext.Provider>
