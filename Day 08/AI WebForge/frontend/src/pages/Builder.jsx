@@ -8,6 +8,10 @@ import ChatPanel from "../components/ChatPanel";
 import FileExplorer from "../components/FileExplorer";
 import PreviewPanel from "../components/PreviewPanel";
 import AgentProgressDashboard from "../components/AgentProgressDashboard";
+import PublishModal from "../components/PublishModal";
+import api from "../api/api";
+import toast from "react-hot-toast";
+import { exportProjectZip } from "../utils/exportProject";
 
 const Builder = () => {
   const { id } = useParams();
@@ -59,9 +63,28 @@ const Builder = () => {
     window.open(`/preview/${id}`, "_blank");
   };
 
-  const handlePublish = async () => {};
+  const handlePublish = async () => {
+    if (!id) return;
+    setPublishing(true);
 
-  const handleDownload = () => {};
+    try {
+      await api.post(`/api/projects/${id}/publish`);
+      const url = `${window.location.origin}/publish/${id}`;
+      setPublishUrl(url);
+      toast.success("Website published successfully!");
+    } catch (err) {
+      console.error("Publish Failed", err);
+      toast.error(err?.response?.data?.error || "Publish Failed");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (!activeProject) return;
+    exportProjectZip(activeProject);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-white overflow-hidden text-zinc-900 relative">
       {/*top header */}
@@ -132,6 +155,13 @@ const Builder = () => {
           )}
         </div>
       </div>
+
+      {publishUrl && (
+        <PublishModal
+          publishUrl={publishUrl}
+          onClose={() => setPublishUrl(null)}
+        />
+      )}
     </div>
   );
 };
