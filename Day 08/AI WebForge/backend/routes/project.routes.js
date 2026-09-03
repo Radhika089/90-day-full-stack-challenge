@@ -9,6 +9,7 @@ import {
   publishProject,
   updateProjectFiles,
 } from "../controllers/project.controller.js";
+import { chat } from "../controllers/chatController.js";
 
 const projectRouter = express.Router();
 
@@ -24,5 +25,8 @@ projectRouter.get("/:id", getProject);
 projectRouter.delete("/:id", deleteProject);
 projectRouter.put("/:id/files", updateProjectFiles);
 projectRouter.post("/:id/publish", publishProject);
+
+//
+projectRouter.post("/:id/chat", chat);
 
 export default projectRouter;
