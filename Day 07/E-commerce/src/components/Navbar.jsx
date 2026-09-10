@@ -37,9 +37,11 @@ const Navbar = () => {
               2
             </span>
           </Link>
-          <button className=" cursor-pointer hover:text-gray-300 transition">
+          <Link
+            to={"/login"}
+            className=" cursor-pointer hover:text-gray-300 transition">
             <User size={20} />
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
