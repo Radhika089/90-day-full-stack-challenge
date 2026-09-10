@@ -1,4 +1,3 @@
-import React from "react";
 import { Search, ShoppingBag, User } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -30,12 +29,14 @@ const Navbar = () => {
           <button className=" cursor-pointer hover:text-gray-300 transition">
             <Search size={20} strokeWidth={1.8} />
           </button>
-          <button className=" cursor-pointer relative hover:text-gray-300 transition">
+          <Link
+            to={"/cart"}
+            className=" cursor-pointer relative hover:text-gray-300 transition">
             <ShoppingBag size={20} strokeWidth={1.8} />
-            <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-white text-black text-[10px] ">
+            <span className="absolute -top-2 text-center -right-2 w-4 h-4 rounded-full bg-white text-black text-[10px] ">
               2
             </span>
-          </button>
+          </Link>
           <button className=" cursor-pointer hover:text-gray-300 transition">
             <User size={20} />
           </button>
