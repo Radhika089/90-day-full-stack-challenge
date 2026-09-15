@@ -43,7 +43,7 @@ export async function register(req, res) {
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
-      data: { user: user.name, email: user.email },
+      data: { user: user.name, email: user.email, role: user.role },
     });
   } catch (error) {
     console.log(error);
@@ -90,7 +90,7 @@ export async function login(req, res) {
     return res.status(200).json({
       success: true,
       message: "User login successfully",
-      data: { user: user.name, email: user.email },
+      data: { user: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (error) {
