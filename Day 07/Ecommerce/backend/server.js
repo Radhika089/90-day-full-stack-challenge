@@ -1,4 +1,13 @@
 import express from "express";
+import dotenv from "dotenv";
+import { dbConnect } from "./config/db.js";
+import dns from "dns";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+dotenv.config();
+
+await dbConnect();
 
 const app = express();
 
