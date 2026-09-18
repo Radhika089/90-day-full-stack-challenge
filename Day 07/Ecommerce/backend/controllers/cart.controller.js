@@ -143,6 +143,13 @@ export async function updateCart(req, res) {
       });
     }
 
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Quantity must be a positive integer",
+      });
+    }
+
     let cart = await cartModel.findOne({ user: req.user._id });
 
     if (!cart) {
