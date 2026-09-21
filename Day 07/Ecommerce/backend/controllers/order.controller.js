@@ -263,10 +263,42 @@ export async function verifyPayment(req, res) {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
 
+    // 1. Check payment details
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({
         success: false,
         message: "Payment details are required",
+      });
+    }
+
+    // 2. Generate signature on our server
+    const generatedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+
+    // 3. Compare Razorpay signature with our generated signature
+    if (generatedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment signature",
+      });
+    }
+
+    // 4. Get Razorpay order
+    const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
+
+    // 5. Find our AURA order
+    const order = await orderModel.findOne({
+      _id: razorpayOrder.receipt,
+      user: req.user._id,
+    });
+
+    // 6. Check if AURA order exists
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
       });
     }
   } catch (error) {
