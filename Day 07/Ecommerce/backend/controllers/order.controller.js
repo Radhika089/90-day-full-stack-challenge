@@ -277,7 +277,7 @@ export async function verifyPayment(req, res) {
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
 
-    // 3. Compare Razorpay signature with our generated signature
+    // 3. Verify signature
     if (generatedSignature !== razorpay_signature) {
       return res.status(400).json({
         success: false,
@@ -288,19 +288,72 @@ export async function verifyPayment(req, res) {
     // 4. Get Razorpay order
     const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
 
-    // 5. Find our AURA order
+    // 5. Find AURA order
     const order = await orderModel.findOne({
       _id: razorpayOrder.receipt,
       user: req.user._id,
     });
 
-    // 6. Check if AURA order exists
     if (!order) {
       return res.status(404).json({
         success: false,
         message: "Order not found",
       });
     }
+
+    // 6. Prevent duplicate payment processing
+    if (order.paymentStatus === "paid") {
+      return res.status(400).json({
+        success: false,
+        message: "Order is already paid",
+      });
+    }
+
+    // 7. Re-check stock before reducing it
+    for (const item of order.items) {
+      const product = await productModel.findById(item.product);
+
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      if (item.quantity > product.stock) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient stock for ${product.name}`,
+        });
+      }
+    }
+
+    // 8. Reduce product stock
+    for (const item of order.items) {
+      const product = await productModel.findById(item.product);
+
+      product.stock -= item.quantity;
+
+      await product.save();
+    }
+
+    // 9. Mark order as paid
+    order.paymentStatus = "paid";
+    order.orderStatus = "processing";
+
+    await order.save();
+
+    // 10. Clear user's cart
+    await cartModel.findOneAndUpdate(
+      { user: req.user._id },
+      { $set: { items: [] } },
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment verified successfully",
+      order,
+    });
   } catch (error) {
     console.error("Payment verification error:", error);
 
