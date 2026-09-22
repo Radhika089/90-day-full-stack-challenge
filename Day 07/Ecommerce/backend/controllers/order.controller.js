@@ -3,7 +3,6 @@ import orderModel from "../models/order.js";
 import productModel from "../models/product.js";
 import crypto from "crypto";
 import razorpay from "../config/razorpay.js";
-import items from "razorpay/dist/types/items.js";
 
 export async function createOrder(req, res) {
   const { shippingAddress } = req.body;
