@@ -3,6 +3,7 @@ import orderModel from "../models/order.js";
 import productModel from "../models/product.js";
 import crypto from "crypto";
 import razorpay from "../config/razorpay.js";
+import items from "razorpay/dist/types/items.js";
 
 export async function createOrder(req, res) {
   const { shippingAddress } = req.body;
@@ -161,6 +162,22 @@ export async function cancelOrder(req, res) {
         success: false,
         message: "Order cannot be cancelled!",
       });
+    }
+
+    if (order.paymentStatus === "paid") {
+      for (const item of order.items) {
+        const product = await productModel.findById(item.product);
+
+        if (!product) {
+          return res.status(404).json({
+            success: false,
+            message: "Product not found.",
+          });
+        }
+
+        product.stock += item.quantity;
+        await product.save();
+      }
     }
 
     order.orderStatus = "cancelled";
@@ -360,6 +377,54 @@ export async function verifyPayment(req, res) {
     return res.status(500).json({
       success: false,
       message: "Payment verification failed",
+      error: error.message,
+    });
+  }
+}
+
+export async function updateOrderStatus(req, res) {
+  const { status } = req.body;
+
+  const allowedStatuses = [
+    "pending",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+  ];
+
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid order status.",
+    });
+  }
+
+  try {
+    const order = await orderModel.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found.",
+      });
+    }
+
+    order.orderStatus = status;
+
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Order status updated successfully.",
+      order,
+    });
+  } catch (error) {
+    console.error("Update order status error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update order status.",
       error: error.message,
     });
   }

@@ -6,6 +6,7 @@ import {
   getAllOrders,
   getMyOrders,
   getOrderById,
+  updateOrderStatus,
   verifyPayment,
 } from "../controllers/order.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -18,6 +19,12 @@ orderRouter.get("/", authMiddleware, getMyOrders);
 
 // admin
 orderRouter.get("/admin", authMiddleware, adminMiddleware, getAllOrders);
+orderRouter.patch(
+  "/admin/:id/status",
+  authMiddleware,
+  adminMiddleware,
+  updateOrderStatus,
+);
 
 // payment
 orderRouter.post("/payment/create", authMiddleware, createRazorpayOrder);

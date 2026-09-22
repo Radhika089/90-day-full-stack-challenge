@@ -1,14 +1,15 @@
 import productModel from "../models/product.js";
 
 export async function createProduct(req, res) {
-  const { name, description, price, category, image, stock, brand } = req.body;
+  const { name, description, price, category, stock, brand } = req.body;
 
   if (
     !name ||
     !description ||
     price === undefined ||
     !category ||
-    stock === undefined
+    stock === undefined ||
+    !req.file
   ) {
     return res.status(400).json({
       success: false,
@@ -31,7 +32,7 @@ export async function createProduct(req, res) {
       description,
       price,
       category,
-      image,
+      image: req.file.path,
       stock,
       brand,
     });
@@ -92,9 +93,15 @@ export async function getSingleProduct(req, res) {
 
 export async function updateProduct(req, res) {
   try {
+    const updateData = { ...req.body };
+
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
+
     const product = await productModel.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true },
     );
 
@@ -138,6 +145,46 @@ export async function deleteProduct(req, res) {
     res.status(500).json({
       success: false,
       message: "Product deletion failed",
+      error: error.message,
+    });
+  }
+}
+
+export async function updateProductStock(req, res) {
+  const { quantity } = req.body;
+
+  try {
+    const product = await productModel.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found.",
+      });
+    }
+
+    if (quantity < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Stock quantity cannot be negative.",
+      });
+    }
+
+    product.stock = quantity;
+
+    await product.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Product stock updated successfully.",
+      product,
+    });
+  } catch (error) {
+    console.error("Update Product stock error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update product stock.",
       error: error.message,
     });
   }
