@@ -33,6 +33,25 @@ export async function createReview(req, res) {
       comment,
     });
 
+    // Get all reviews of this product
+    const reviews = await reviewModel.find({
+      product: req.params.id,
+    });
+
+    // Count reviews
+    const reviewCount = reviews.length;
+
+    // Calculate average rating
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+
+    const averageRating = totalRating / reviewCount;
+
+    // Update product
+    product.rating = averageRating;
+    product.reviewCount = reviewCount;
+
+    await product.save();
+
     return res.status(201).json({
       success: true,
       message: "Review created successfully.",
@@ -61,7 +80,9 @@ export async function getProductReviews(req, res) {
     }
 
     const reviews = await reviewModel
-      .find({ product: req.params.id })
+      .find({
+        product: req.params.id,
+      })
       .populate("user", "name");
 
     return res.status(200).json({
@@ -101,6 +122,33 @@ export async function updateReview(req, res) {
 
     await review.save();
 
+    // Get the product
+    const product = await productModel.findById(review.product);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // Get all reviews of this product
+    const reviews = await reviewModel.find({
+      product: review.product,
+    });
+
+    const reviewCount = reviews.length;
+
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+
+    const averageRating = totalRating / reviewCount;
+
+    // Update product rating and review count
+    product.rating = averageRating;
+    product.reviewCount = reviewCount;
+
+    await product.save();
+
     return res.status(200).json({
       success: true,
       message: "Review updated successfully",
@@ -131,7 +179,43 @@ export async function deleteReview(req, res) {
       });
     }
 
+    const productId = review.product;
+
     await reviewModel.findByIdAndDelete(req.params.id);
+
+    // Get the product
+    const product = await productModel.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // Get remaining reviews
+    const reviews = await reviewModel.find({
+      product: productId,
+    });
+
+    const reviewCount = reviews.length;
+
+    let averageRating = 0;
+
+    if (reviewCount > 0) {
+      const totalRating = reviews.reduce(
+        (sum, review) => sum + review.rating,
+        0,
+      );
+
+      averageRating = totalRating / reviewCount;
+    }
+
+    // Update product rating and review count
+    product.rating = averageRating;
+    product.reviewCount = reviewCount;
+
+    await product.save();
 
     return res.status(200).json({
       success: true,
