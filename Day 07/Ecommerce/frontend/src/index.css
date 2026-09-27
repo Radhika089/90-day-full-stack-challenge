@@ -1,9 +1,11 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Serif+Display&family=Lora:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 body {
   font-family: "DM Sans", sans-serif;
 }
-.aura-hero-swiper .swiper-pagination {
+
+/*.aura-hero-swiper .swiper-pagination {
   bottom: 20px;
 }
 
@@ -20,4 +22,4 @@ body {
   width: 24px;
   border-radius: 999px;
   opacity: 1;
-}
+} */

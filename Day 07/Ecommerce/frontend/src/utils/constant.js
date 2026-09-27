@@ -30,7 +30,7 @@ const products = [
     description:
       "A smooth and balanced coffee with notes of caramel, cocoa, and toasted nuts.",
     image:
-      "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80",
+      "https://image.made-in-china.com/2f0j00eGEoAcTURzuQ/Packaging-Coffee-Bags-Flat-Bottom-Kraft-Paper-Aluminum-Foil-Coffee-Bag-with-Zipper-and-Degassing-Valve.jpg",
   },
 
   {
@@ -46,7 +46,7 @@ const products = [
     description:
       "Our signature blend combining rich chocolate notes with a smooth caramel finish.",
     image:
-      "https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=800&q=80",
+      "https://shopcdnpro.grainajz.com/category/83624/2839/37932dac9402132b570b1c3d8a073ae3/Coffee%20Beans%20Bags%207.png",
   },
 
   {
@@ -61,8 +61,7 @@ const products = [
     reviews: 76,
     description:
       "A mellow and nutty coffee with milk chocolate sweetness and a silky body.",
-    image:
-      "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
+    image: "https://assets.mockey.ai/mockups/pouch/pouch-146-preview-thumb.png",
   },
 
   {
