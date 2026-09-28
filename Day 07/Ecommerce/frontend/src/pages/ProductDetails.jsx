@@ -140,7 +140,7 @@ const ProductDetails = () => {
               {/* Price */}
               <div className="mt-5 flex items-center gap-3">
                 <span className="text-2xl font-semibold text-[#3a1407]">
-                  ${product.price.toFixed(2)}
+                  ₹{product.price.toFixed(0)}
                 </span>
                 <span className="text-xs text-[#947765]">250g</span>
               </div>
@@ -285,7 +285,7 @@ const ProductDetails = () => {
                       </h3>
 
                       <span className="shrink-0 text-sm font-semibold text-[#3a1407]">
-                        ${item.price.toFixed(2)}
+                        ₹{item.price.toFixed(0)}
                       </span>
                     </div>
 
