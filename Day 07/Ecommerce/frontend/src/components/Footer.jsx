@@ -158,7 +158,7 @@ export default function Footer() {
       {/* REAL BEAN IMAGE */}
       <div className="absolute bottom-0 left-0 w-full">
         <img
-          src="/images/coffee-beans-pile.png"
+          src="/coffee-beans-pile.png"
           alt=""
           className="block w-full object-cover object-bottom"
         />
