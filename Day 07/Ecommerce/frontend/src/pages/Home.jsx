@@ -1,9 +1,9 @@
-import About from "../components/About";
 import ProductCard from "../components/ProductCard";
 import AuraHero from "../components/Hero";
-import AuraWay from "../components/AuraWay";
-import ShopCategory from "../components/ShopCategory";
 import FeaturedCoffee from "../components/FeaturedCoffee";
+import WhyChooseUs from "../components/WhyChooseUs";
+import ExploreCollection from "../components/ExploreCollection";
+import CTA from "../components/CTA";
 
 const Home = () => {
   return (
@@ -11,7 +11,9 @@ const Home = () => {
       <AuraHero />
       <FeaturedCoffee />
       <ProductCard />
-      <About />
+      <WhyChooseUs />
+      <ExploreCollection />
+      <CTA />
     </div>
   );
 };
