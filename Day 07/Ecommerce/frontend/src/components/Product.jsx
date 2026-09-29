@@ -1,7 +1,19 @@
-import { Heart, Plus, ShoppingBag, Star } from "lucide-react";
+import { Heart, ShoppingBag, Star } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { addToCart } from "../api/cartApi";
 
 const Product = ({ product }) => {
+  const handleAddToCart = async () => {
+    try {
+      const data = await addToCart(product._id, 1);
+
+      console.log(data);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
   const discount = product.discountPercentage || 0;
 
   const discountedPrice = product.price - (product.price * discount) / 100;
@@ -40,7 +52,7 @@ const Product = ({ product }) => {
         <div className="absolute bottom-4 left-4 right-4 z-20 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <button
             type="button"
-            onClick={(e) => e.stopPropagation()}
+            onClick={handleAddToCart}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-[#fffaf2]/95 py-3 text-xs font-semibold text-[#3a1407] shadow-lg backdrop-blur-sm transition hover:bg-[#3a1407] hover:text-white">
             <ShoppingBag size={14} />
             Add to cart

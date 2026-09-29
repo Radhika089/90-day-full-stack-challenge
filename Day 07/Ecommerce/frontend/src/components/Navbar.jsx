@@ -9,11 +9,50 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
+import { useEffect } from "react";
+import { getCart, updateCart, removeFromCart } from "../api/cartApi";
 
 const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [cart, setCart] = useState(null);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const data = await getCart();
+        setCart(data.cart);
+      } catch (error) {
+        console.error("Failed to fetch cart:", error);
+      }
+    };
+    fetchCart();
+  }, []);
+
+  const handleUpdateQuantity = async (productId, newQuantity) => {
+    try {
+      const data = await updateCart(productId, newQuantity);
+      setCart(data.cart);
+    } catch (error) {
+      console.error("Failed to update cart:", error);
+    }
+  };
+
+  const handleRemoveItem = async (productId) => {
+    try {
+      const data = await removeFromCart(productId);
+      setCart(data.cart);
+    } catch (error) {
+      console.error("Failed to remove item from cart:", error);
+    }
+  };
+
+  const subtotal =
+    cart?.items.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0,
+    ) || 0;
 
   const navItems = [
     { name: "Shop", path: "/shop" },
@@ -108,7 +147,7 @@ const Navbar = () => {
 
               {/* Temporary cart count */}
               <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#b96447] text-[9px] font-semibold text-white">
-                2
+                {cart?.items.length || 0}
               </span>
             </button>
 
@@ -213,83 +252,67 @@ const Navbar = () => {
 
             {/* Cart Items */}
             <div className="flex-1 overflow-y-auto px-6 py-6">
-              {/* Product 1 */}
-              <div className="flex gap-4 border-b border-[#e6ddd5] pb-5">
-                <div className="h-20 w-20 shrink-0 bg-[#e9dfd5]" />
-
-                <div className="flex-1">
-                  <div className="flex justify-between gap-3">
-                    <div>
-                      <h3 className="text-sm font-medium">House Blend</h3>
-
-                      <p className="mt-1 text-xs text-[#8d8178]">
-                        Medium Roast
-                      </p>
-                    </div>
-
-                    <p className="text-sm font-medium">$18</p>
+              {cart?.items.map(({ product, quantity }) => (
+                <div
+                  key={product._id}
+                  className="flex gap-4 border-b border-[#e6ddd5] py-5">
+                  <div className="h-20 w-20 shrink-0 overflow-hidden bg-[#e9dfd5]">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between">
-                    {/* Quantity */}
-                    <div className="flex items-center border border-[#d8cfc7]">
-                      <button className="px-3 py-1 text-sm transition hover:bg-[#eee7df]">
-                        −
-                      </button>
+                  <div className="flex-1">
+                    <div className="flex justify-between gap-3">
+                      <div>
+                        <h3 className="text-sm font-medium">{product.name}</h3>
 
-                      <span className="border-x border-[#d8cfc7] px-3 py-1 text-xs">
-                        1
-                      </span>
+                        <p className="mt-1 text-xs text-[#8d8178]">
+                          {product.category}
+                        </p>
+                      </div>
 
-                      <button className="px-3 py-1 text-sm transition hover:bg-[#eee7df]">
-                        +
-                      </button>
+                      <p className="text-sm font-medium">₹{product.price}</p>
                     </div>
 
-                    <button className="text-[10px] text-[#9a7658] transition hover:text-[#2d211b]">
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
+                    <div className="mt-4 flex items-center justify-between">
+                      {/* Quantity */}
+                      <div className="flex items-center border border-[#d8cfc7]">
+                        <button
+                          className="px-3 py-1 text-sm transition hover:bg-[#eee7df]"
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              product._id,
+                              Math.max(1, quantity - 1),
+                            )
+                          }>
+                          −
+                        </button>
 
-              {/* Product 2 */}
-              <div className="flex gap-4 py-5">
-                <div className="h-20 w-20 shrink-0 bg-[#e9dfd5]" />
+                        <span className="border-x border-[#d8cfc7] px-3 py-1 text-xs">
+                          {quantity}
+                        </span>
 
-                <div className="flex-1">
-                  <div className="flex justify-between gap-3">
-                    <div>
-                      <h3 className="text-sm font-medium">Ceramic Mug</h3>
+                        <button
+                          className="px-3 py-1 text-sm transition hover:bg-[#eee7df]"
+                          onClick={() =>
+                            handleUpdateQuantity(product._id, quantity + 1)
+                          }>
+                          +
+                        </button>
+                      </div>
 
-                      <p className="mt-1 text-xs text-[#8d8178]">Sand</p>
-                    </div>
-
-                    <p className="text-sm font-medium">$24</p>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    {/* Quantity */}
-                    <div className="flex items-center border border-[#d8cfc7]">
-                      <button className="px-3 py-1 text-sm transition hover:bg-[#eee7df]">
-                        −
-                      </button>
-
-                      <span className="border-x border-[#d8cfc7] px-3 py-1 text-xs">
-                        1
-                      </span>
-
-                      <button className="px-3 py-1 text-sm transition hover:bg-[#eee7df]">
-                        +
+                      <button
+                        className="text-[10px] text-[#9a7658] transition hover:text-[#2d211b]"
+                        onClick={() => handleRemoveItem(product._id)}>
+                        Remove
                       </button>
                     </div>
-
-                    <button className="text-[10px] text-[#9a7658] transition hover:text-[#2d211b]">
-                      Remove
-                    </button>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
 
             {/* Drawer Footer */}
@@ -297,7 +320,7 @@ const Navbar = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-[#6f6259]">Subtotal</span>
 
-                <span className="text-lg font-semibold">$42</span>
+                <span className="text-lg font-semibold">₹{subtotal}</span>
               </div>
 
               <p className="mt-2 text-[10px] leading-5 text-[#a0948b]">

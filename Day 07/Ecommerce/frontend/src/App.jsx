@@ -11,10 +11,12 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MainLayout from "./layout/MainLayout";
 import Wishlist from "./pages/Wishlist";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   ArrowRight,
   Minus,
@@ -9,30 +8,57 @@ import {
   X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import products from "../utils/constant";
+import { useState } from "react";
+import { useEffect } from "react";
+import { clearCart, getCart, removeFromCart, updateCart } from "../api/cartApi";
 
 const Cart = () => {
-  // Temporary cart data.
-  // Replace this with your backend cart data later.
-  const cartItems = [
-    {
-      product: products[0],
-      quantity: 1,
-    },
-    {
-      product: products[1],
-      quantity: 1,
-    },
-    {
-      product: products[2],
-      quantity: 1,
-    },
-  ];
+  const [cart, setCart] = useState(null);
 
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0,
-  );
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const data = await getCart();
+        setCart(data.cart);
+      } catch (error) {
+        console.error("Failed to fetch cart:", error);
+      }
+    };
+    fetchCart();
+  }, []);
+
+  const handleUpdateQuantity = async (productId, newQuantity) => {
+    try {
+      const data = await updateCart(productId, newQuantity);
+      setCart(data.cart);
+    } catch (error) {
+      console.error("Failed to update cart:", error);
+    }
+  };
+
+  const handleRemoveItem = async (productId) => {
+    try {
+      const data = await removeFromCart(productId);
+      setCart(data.cart);
+    } catch (error) {
+      console.error("Failed to remove item from the cart:", error);
+    }
+  };
+
+  const handleClearCart = async () => {
+    try {
+      const data = await clearCart();
+      setCart(data.cart);
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
+    }
+  };
+
+  const subtotal =
+    cart?.items.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0,
+    ) || 0;
 
   const shipping = subtotal >= 50 ? 0 : 5;
   const discount = 0;
@@ -66,7 +92,7 @@ const Cart = () => {
           </div>
 
           <p className="pb-1 text-xs text-[#8c7b70]">
-            {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
+            {cart?.items.length} {cart?.items.length === 1 ? "item" : "items"}
           </p>
         </div>
 
@@ -84,17 +110,17 @@ const Cart = () => {
 
             {/* PRODUCTS */}
             <div className="divide-y divide-[#ebe2d8]">
-              {cartItems.map(({ product, quantity }) => {
+              {cart?.items.map(({ product, quantity }) => {
                 const itemTotal = product.price * quantity;
 
                 return (
                   <article
-                    key={product.id}
+                    key={product._id}
                     className="group relative grid grid-cols-1 gap-4 py-4 sm:grid-cols-[minmax(0,1fr)_110px_90px_30px] sm:items-center sm:gap-4 sm:px-3">
                     {/* PRODUCT */}
                     <div className="flex min-w-0 items-center gap-4">
                       <Link
-                        to={`/products/${product.id}`}
+                        to={`/products/${product._id}`}
                         className="group/image h-20 w-20 shrink-0 overflow-hidden rounded-[10px] bg-[#f1e8dd] sm:h-[86px] sm:w-[86px]">
                         <img
                           src={product.image}
@@ -108,7 +134,7 @@ const Cart = () => {
                           {product.category}
                         </p>
 
-                        <Link to={`/products/${product.id}`}>
+                        <Link to={`/products/${product._id}`}>
                           <h2 className="truncate text-sm font-semibold text-[#3a1407] transition-colors hover:text-[#99502b] sm:text-[15px]">
                             {product.name}
                           </h2>
@@ -137,7 +163,15 @@ const Cart = () => {
                           type="button"
                           className="flex h-full w-8 items-center justify-center rounded-l-full text-[#625247] transition hover:bg-[#f2e9de]"
                           aria-label="Decrease quantity">
-                          <Minus size={11} />
+                          <Minus
+                            size={11}
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                product._id,
+                                Math.max(1, quantity - 1),
+                              )
+                            }
+                          />
                         </button>
 
                         <span className="flex h-full w-8 items-center justify-center border-x border-[#ded2c5] text-[11px] font-medium text-[#3a1407]">
@@ -148,7 +182,15 @@ const Cart = () => {
                           type="button"
                           className="flex h-full w-8 items-center justify-center rounded-r-full text-[#625247] transition hover:bg-[#f2e9de]"
                           aria-label="Increase quantity">
-                          <Plus size={11} />
+                          <Plus
+                            size={11}
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                product._id,
+                                Math.max(1, quantity + 1),
+                              )
+                            }
+                          />
                         </button>
                       </div>
                     </div>
@@ -165,7 +207,10 @@ const Cart = () => {
                       type="button"
                       className="absolute right-0 top-4 flex h-7 w-7 items-center justify-center rounded-full text-[#a29286] transition hover:bg-[#f5e8dc] hover:text-[#a64f32] sm:static"
                       aria-label={`Remove ${product.name}`}>
-                      <X size={14} />
+                      <X
+                        size={14}
+                        onClick={() => handleRemoveItem(product._id)}
+                      />
                     </button>
                   </article>
                 );
@@ -182,7 +227,8 @@ const Cart = () => {
 
               <button
                 type="button"
-                className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.12em] text-[#98877a] transition-colors hover:text-[#a64f32]">
+                className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.12em] text-[#98877a] transition-colors hover:text-[#a64f32]"
+                onClick={handleClearCart}>
                 <Trash2 size={13} />
                 Remove All Items
               </button>

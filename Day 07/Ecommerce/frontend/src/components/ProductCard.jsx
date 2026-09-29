@@ -1,10 +1,26 @@
 import Product from "./Product";
-import products from "../utils/constant";
 import { ArrowUpRight } from "lucide-react";
 import Skelton from "./Skelton";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useState } from "react";
+import { getProducts } from "../api/productApi";
 
 const ProductCard = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data.products);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const featuredProducts = products.slice(0, 4);
 
   return featuredProducts.length === 0 ? (
@@ -69,7 +85,7 @@ const ProductCard = () => {
         {/* Products */}
         <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {featuredProducts.map((product) => (
-            <Product key={product.id} product={product} />
+            <Product key={product._id} product={product} />
           ))}
         </div>
 

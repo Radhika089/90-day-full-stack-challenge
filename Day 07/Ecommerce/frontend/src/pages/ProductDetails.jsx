@@ -10,8 +10,8 @@ import {
   Star,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import products from "../utils/constant";
 import { getProducts, getSingleProduct } from "../api/productApi";
+import { addToCart } from "../api/cartApi";
 
 const ProductDetails = () => {
   const { productId } = useParams();
@@ -33,6 +33,16 @@ const ProductDetails = () => {
     };
     fetchProduct();
   }, [productId]);
+
+  const handleAddToCart = async () => {
+    try {
+      const data = await addToCart(product._id, quantity);
+
+      console.log(data);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
 
   const relatedProducts = product
     ? products
@@ -221,7 +231,9 @@ const ProductDetails = () => {
 
               {/* Buttons */}
               <div className="mt-7 grid grid-cols-2 gap-3">
-                <button className="flex h-12 items-center justify-center gap-2 rounded-[6px] border border-[#3a1407] bg-transparent text-sm font-semibold text-[#3a1407] transition hover:bg-[#f3e5d3]">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex h-12 items-center justify-center gap-2 rounded-[6px] border border-[#3a1407] bg-transparent text-sm font-semibold text-[#3a1407] transition hover:bg-[#f3e5d3]">
                   <ShoppingBag size={16} />
                   Add to cart
                 </button>
