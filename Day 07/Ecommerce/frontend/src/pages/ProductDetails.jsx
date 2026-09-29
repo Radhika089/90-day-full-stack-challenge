@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -11,15 +11,37 @@ import {
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import products from "../utils/constant";
+import { getProducts, getSingleProduct } from "../api/productApi";
 
 const ProductDetails = () => {
   const { productId } = useParams();
 
-  const product = products.find((item) => item.id === Number(productId));
+  const [product, setProduct] = useState(null);
+  const [products, setProducts] = useState([]);
 
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isWishListed, setIsWishListed] = useState(false);
   const [selectedRoast, setSelectedRoast] = useState("Medium");
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const data = await getSingleProduct(productId);
+      setProduct(data.product);
+
+      const allProducts = await getProducts();
+      setProducts(allProducts.products);
+    };
+    fetchProduct();
+  }, [productId]);
+
+  const relatedProducts = product
+    ? products
+        .filter(
+          (item) =>
+            item.category === product.category && item._id !== product._id,
+        )
+        .slice(0, 4)
+    : [];
 
   if (!product) {
     return (
@@ -41,12 +63,6 @@ const ProductDetails = () => {
       </div>
     );
   }
-
-  const relatedProducts = products
-    .filter(
-      (item) => item.category === product.category && item.id !== product.id,
-    )
-    .slice(0, 4);
 
   return (
     <main className="min-h-screen bg-[#fffaf2] font-sans text-[#3a1407]">
@@ -81,11 +97,11 @@ const ProductDetails = () => {
                 />
 
                 <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition ${isWishlisted ? "border-[#b87543] bg-[#fff6e5] text-[#9a4f28]" : "border-[#dfcdb8] bg-[#fffaf2]/90 text-[#76584a] hover:bg-white"}`}>
+                  onClick={() => setIsWishListed(!isWishListed)}
+                  className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition ${isWishListed ? "border-[#b87543] bg-[#fff6e5] text-[#9a4f28]" : "border-[#dfcdb8] bg-[#fffaf2]/90 text-[#76584a] hover:bg-white"}`}>
                   <Heart
                     size={17}
-                    fill={isWishlisted ? "currentColor" : "none"}
+                    fill={isWishListed ? "currentColor" : "none"}
                   />
                 </button>
               </div>
@@ -128,7 +144,7 @@ const ProductDetails = () => {
                 <span className="h-1 w-1 rounded-full bg-[#cbb39d]" />
 
                 <span className="text-xs text-[#806858]">
-                  {product.reviews} reviews
+                  {product.reviewCount} reviews
                 </span>
               </div>
 
@@ -248,8 +264,8 @@ const ProductDetails = () => {
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
               {relatedProducts.map((item) => (
                 <Link
-                  key={item.id}
-                  to={`/products/${item.id}`}
+                  key={item._id}
+                  to={`/products/${item._id}`}
                   className="group">
                   <div className="relative overflow-hidden rounded-[12px] bg-[#e9dbc8]">
                     <div className="aspect-[0.88] overflow-hidden">

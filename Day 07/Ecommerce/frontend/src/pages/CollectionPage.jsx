@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -6,8 +6,8 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import products from "../utils/constant";
 import Product from "../components/Product";
+import { getProducts } from "../api/productApi";
 
 const CollectionPage = ({
   title = "Shop Our Coffee",
@@ -19,6 +19,7 @@ const CollectionPage = ({
   const [selectedRoast, setSelectedRoast] = useState("all");
   const [sortBy, setSortBy] = useState("Featured");
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState([]);
 
   const productsPerPage = 8;
 
@@ -44,7 +45,7 @@ const CollectionPage = ({
     }
 
     return products.filter((product) => product.category === category);
-  }, [category]);
+  }, [category, products]);
 
   const filteredProducts = useMemo(() => {
     let result = [...availableProducts];
@@ -97,6 +98,17 @@ const CollectionPage = ({
     setSortBy(value);
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const data = await getProducts();
+
+      console.log("API DATA:", data);
+
+      setProducts(data.products);
+    };
+    fetchProducts();
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#fffaf2] font-sans text-[#3a1407]">
@@ -293,7 +305,7 @@ const CollectionPage = ({
               {visibleProducts.length > 0 ? (
                 <div className="grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
                   {visibleProducts.map((product) => (
-                    <Product product={product} key={product.id} />
+                    <Product product={product} key={product._id} />
                   ))}
                 </div>
               ) : (

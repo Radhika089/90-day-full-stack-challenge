@@ -26,7 +26,7 @@ const Product = ({ product }) => {
         </button>
 
         {/* Product Image */}
-        <Link to={`/products/${product.id}`}>
+        <Link to={`/products/${product._id}`}>
           <div className="flex h-[250px] items-center justify-center overflow-hidden sm:h-[265px]">
             <img
               src={product.image}
