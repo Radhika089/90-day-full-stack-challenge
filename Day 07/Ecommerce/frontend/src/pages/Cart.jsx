@@ -1,248 +1,317 @@
 import React from "react";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import {
+  ArrowRight,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Tag,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import hero from "../assets/hero/hero3.jpg";
+import products from "../utils/constant";
 
 const Cart = () => {
+  // Temporary cart data.
+  // Replace this with your backend cart data later.
+  const cartItems = [
+    {
+      product: products[0],
+      quantity: 1,
+    },
+    {
+      product: products[1],
+      quantity: 1,
+    },
+    {
+      product: products[2],
+      quantity: 1,
+    },
+  ];
+
+  const subtotal = cartItems.reduce(
+    (total, item) => total + item.product.price * item.quantity,
+    0,
+  );
+
+  const shipping = subtotal >= 50 ? 0 : 5;
+  const discount = 0;
+  const total = subtotal + shipping - discount;
+
   return (
-    <div className="min-h-screen bg-[#fdfbf7] px-5 py-12 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-10">
-          <Link
-            to="/shop"
-            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#6f6259] transition hover:text-[#9a7658]">
-            <ArrowLeft size={16} />
-            Continue Shopping
+    <main className="min-h-screen bg-[#fffaf4] font-sans text-[#2f211b]">
+      {/* PAGE */}
+      <div className="mx-auto max-w-7xl px-5 pb-20 pt-8 sm:px-8 md:px-10 lg:pt-10">
+        {/* BREADCRUMB */}
+        <div className="mb-8 flex items-center gap-2 text-[11px] text-[#8c7b70]">
+          <Link to="/" className="transition-colors hover:text-[#8d4f2d]">
+            Home
           </Link>
 
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <div className="mb-3 flex items-center gap-3">
-                <span className="h-px w-8 bg-[#9a7658]" />
+          <span className="text-[#c5b5a7]">›</span>
 
-                <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#9a7658]">
-                  Your Selection
-                </p>
-              </div>
-
-              <h1 className="text-4xl font-semibold tracking-tight text-[#2d211b] sm:text-5xl">
-                Shopping Cart
-              </h1>
-
-              <p className="mt-3 text-sm text-[#8d8178]">
-                Review your items before checkout.
-              </p>
-            </div>
-
-            <span className="hidden text-sm text-[#8d8178] sm:block">
-              1 item
-            </span>
-          </div>
+          <span className="font-medium text-[#3a1407]">Cart</span>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_380px] lg:items-start">
-          {/* Cart Items */}
-          <div className="space-y-4">
-            {/* Cart Item */}
-            <div className="relative border border-[#e7dfd7] bg-white p-4 sm:p-5">
-              <div className="flex gap-4 sm:gap-6">
-                {/* Product Image */}
-                <div className="h-28 w-28 shrink-0 overflow-hidden bg-[#f1ece5] sm:h-36 sm:w-36">
-                  <img
-                    src={hero}
-                    alt="Coffee"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+        {/* HEADING */}
+        <div className="mb-8 flex items-end justify-between gap-5">
+          <div>
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#a05f38]">
+              YOUR COFFEE SELECTION
+            </p>
 
-                {/* Product Information */}
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9a7658]">
-                        Brews
-                      </p>
+            <h1 className="text-4xl font-medium tracking-[-0.04em] text-[#3a1407] sm:text-5xl">
+              Your Cart
+            </h1>
+          </div>
 
-                      <h2 className="mt-1 text-lg font-semibold tracking-tight text-[#2d211b] sm:text-xl">
-                        Signature Coffee
-                      </h2>
+          <p className="pb-1 text-xs text-[#8c7b70]">
+            {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
+          </p>
+        </div>
 
-                      <p className="mt-1 text-xs text-[#92857b]">
-                        Medium Roast · 250g
-                      </p>
+        {/* MAIN GRID */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_350px] lg:items-start">
+          {/* CART */}
+          <section className="rounded-[18px] border border-[#e3d9ce] bg-[#fffdf9] p-4 sm:p-5 md:p-6">
+            {/* CART HEADER */}
+            <div className="mb-3 hidden grid-cols-[minmax(0,1fr)_110px_90px_30px] items-center gap-4 px-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#968579] sm:grid">
+              <span>Product</span>
+              <span className="text-center">Quantity</span>
+              <span className="text-right">Price</span>
+              <span />
+            </div>
+
+            {/* PRODUCTS */}
+            <div className="divide-y divide-[#ebe2d8]">
+              {cartItems.map(({ product, quantity }) => {
+                const itemTotal = product.price * quantity;
+
+                return (
+                  <article
+                    key={product.id}
+                    className="group relative grid grid-cols-1 gap-4 py-4 sm:grid-cols-[minmax(0,1fr)_110px_90px_30px] sm:items-center sm:gap-4 sm:px-3">
+                    {/* PRODUCT */}
+                    <div className="flex min-w-0 items-center gap-4">
+                      <Link
+                        to={`/products/${product.id}`}
+                        className="group/image h-20 w-20 shrink-0 overflow-hidden rounded-[10px] bg-[#f1e8dd] sm:h-[86px] sm:w-[86px]">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover/image:scale-105"
+                        />
+                      </Link>
+
+                      <div className="min-w-0">
+                        <p className="mb-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-[#a05f38]">
+                          {product.category}
+                        </p>
+
+                        <Link to={`/products/${product.id}`}>
+                          <h2 className="truncate text-sm font-semibold text-[#3a1407] transition-colors hover:text-[#99502b] sm:text-[15px]">
+                            {product.name}
+                          </h2>
+                        </Link>
+
+                        <p className="mt-1 text-[10px] text-[#8d7d72]">
+                          {product.roast
+                            ? `${product.roast} Roast`
+                            : product.description}
+                        </p>
+
+                        <p className="mt-1 text-[10px] text-[#a29286] sm:hidden">
+                          ₹{itemTotal.toFixed(0)}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Remove */}
-                    <button
-                      type="button"
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8d8178] transition hover:bg-[#f5f0eb] hover:text-[#2d211b]"
-                      aria-label="Remove item">
-                      <X size={17} strokeWidth={1.8} />
-                    </button>
-                  </div>
-
-                  <div className="mt-auto flex flex-wrap items-end justify-between gap-4 pt-6">
-                    {/* Quantity */}
-                    <div>
-                      <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.15em] text-[#a0948b]">
+                    {/* QUANTITY */}
+                    <div className="flex items-center justify-between sm:justify-center">
+                      <span className="text-[9px] uppercase tracking-[0.12em] text-[#9b8c81] sm:hidden">
                         Quantity
-                      </p>
+                      </span>
 
-                      <div className="flex h-9 items-center border border-[#dcd2c9]">
+                      <div className="flex h-8 items-center rounded-full border border-[#ded2c5] bg-[#fffaf4]">
                         <button
                           type="button"
-                          className="flex h-full w-9 items-center justify-center text-[#5d4b3e] transition hover:bg-[#f5f0eb]">
-                          <Minus size={13} />
+                          className="flex h-full w-8 items-center justify-center rounded-l-full text-[#625247] transition hover:bg-[#f2e9de]"
+                          aria-label="Decrease quantity">
+                          <Minus size={11} />
                         </button>
 
-                        <span className="flex h-full w-9 items-center justify-center border-x border-[#dcd2c9] text-sm font-medium text-[#2d211b]">
-                          1
+                        <span className="flex h-full w-8 items-center justify-center border-x border-[#ded2c5] text-[11px] font-medium text-[#3a1407]">
+                          {quantity}
                         </span>
 
                         <button
                           type="button"
-                          className="flex h-full w-9 items-center justify-center text-[#5d4b3e] transition hover:bg-[#f5f0eb]">
-                          <Plus size={13} />
+                          className="flex h-full w-8 items-center justify-center rounded-r-full text-[#625247] transition hover:bg-[#f2e9de]"
+                          aria-label="Increase quantity">
+                          <Plus size={11} />
                         </button>
                       </div>
                     </div>
 
-                    {/* Price */}
-                    <div className="text-right">
-                      <p className="text-[11px] text-[#a0948b]">$20.00 × 1</p>
-
-                      <p className="mt-1 text-lg font-semibold text-[#2d211b]">
-                        $20.00
-                      </p>
+                    {/* PRICE */}
+                    <div className="hidden text-right sm:block">
+                      <span className="text-sm font-semibold text-[#3a1407]">
+                        ₹{itemTotal.toFixed(0)}
+                      </span>
                     </div>
-                  </div>
-                </div>
-              </div>
+
+                    {/* REMOVE */}
+                    <button
+                      type="button"
+                      className="absolute right-0 top-4 flex h-7 w-7 items-center justify-center rounded-full text-[#a29286] transition hover:bg-[#f5e8dc] hover:text-[#a64f32] sm:static"
+                      aria-label={`Remove ${product.name}`}>
+                      <X size={14} />
+                    </button>
+                  </article>
+                );
+              })}
             </div>
 
-            {/* Clear Cart */}
-            <div className="flex justify-end pt-2">
+            {/* CART FOOTER */}
+            <div className="mt-4 flex flex-col gap-4 border-t border-[#ebe2d8] px-3 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <Link
+                to="/shop"
+                className="inline-flex items-center gap-2 text-xs font-medium text-[#6f5d51] transition-colors hover:text-[#9a4f28]">
+                ← Continue Shopping
+              </Link>
+
               <button
                 type="button"
-                className="inline-flex items-center gap-2 text-xs font-medium text-[#8d8178] transition hover:text-[#b45f46]">
-                <Trash2 size={14} />
-                Remove all items
+                className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.12em] text-[#98877a] transition-colors hover:text-[#a64f32]">
+                <Trash2 size={13} />
+                Remove All Items
               </button>
             </div>
-          </div>
+          </section>
 
-          {/* Order Summary */}
-          <aside className="border border-[#e7dfd7] bg-white p-6 sm:p-7 lg:sticky lg:top-28">
-            <div className="flex items-center gap-2">
-              <ShoppingBag size={18} className="text-[#9a7658]" />
+          {/* RIGHT SIDE */}
+          <aside className="space-y-5">
+            {/* COUPON */}
+            <div className="rounded-[18px] border border-[#e3d9ce] bg-[#fffdf9] p-5 sm:p-6">
+              <div className="flex items-center gap-2">
+                <Tag size={15} className="text-[#a05f38]" />
 
-              <h2 className="text-lg font-semibold text-[#2d211b]">
-                Order Summary
-              </h2>
-            </div>
+                <h2 className="text-base font-semibold text-[#3a1407]">
+                  Coupon Code
+                </h2>
+              </div>
 
-            {/* Coupon */}
-            <div className="mt-7">
-              <label className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8d8178]">
-                Promo Code
-              </label>
-
-              <div className="mt-2 flex h-11">
+              <div className="mt-4 flex h-10">
                 <input
                   type="text"
-                  placeholder="Enter code"
-                  className="min-w-0 flex-1 border border-r-0 border-[#dcd2c9] bg-[#fdfbf7] px-3 text-sm text-[#2d211b] outline-none placeholder:text-[#b2a69d] focus:border-[#9a7658]"
+                  placeholder="Enter your coupon code"
+                  className="min-w-0 flex-1 rounded-l-[8px] border border-r-0 border-[#ded2c5] bg-[#faf6f0] px-3 text-[10px] text-[#3a1407] outline-none placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                 />
 
                 <button
                   type="button"
-                  className="bg-[#2d211b] px-5 text-xs font-medium text-white transition hover:bg-[#40312a]">
+                  className="rounded-r-[8px] bg-[#3a1407] px-5 text-[10px] font-semibold text-white transition-colors hover:bg-[#54200f]">
                   Apply
                 </button>
               </div>
             </div>
 
-            {/* Price Breakdown */}
-            <div className="mt-7 space-y-4 border-t border-[#e8e0d8] pt-6">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-[#8d8178]">Subtotal</span>
+            {/* ORDER SUMMARY */}
+            <div className="rounded-[18px] border border-[#e3d9ce] bg-[#fffdf9] p-5 sm:p-6">
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={16} className="text-[#a05f38]" />
 
-                <span className="font-medium text-[#40352f]">$20.00</span>
+                <h2 className="text-base font-semibold text-[#3a1407]">
+                  Order Summary
+                </h2>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-[#8d8178]">Shipping</span>
+              <div className="mt-5 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[#817168]">Subtotal</span>
 
-                <span className="font-medium text-[#40352f]">$5.00</span>
+                  <span className="font-medium text-[#3a1407]">
+                    ₹{subtotal.toFixed(0)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[#817168]">Shipping</span>
+
+                  <span className="font-medium text-[#3a1407]">
+                    {shipping === 0 ? "Free" : `₹${shipping.toFixed(0)}`}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[#817168]">Discount</span>
+
+                  <span className="font-medium text-[#a05f38]">
+                    -₹{discount.toFixed(0)}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-[#8d8178]">Discount</span>
+              <div className="my-5 h-px bg-[#e7ddd3]" />
 
-                <span className="font-medium text-[#9a7658]">-$0.00</span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-[#3a1407]">
+                  Total
+                </span>
+
+                <span className="text-xl font-semibold tracking-tight text-[#3a1407]">
+                  ₹{total.toFixed(0)}
+                </span>
               </div>
+
+              <Link
+                to="/checkout"
+                className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#3a1407] text-[11px] font-semibold text-white transition-all duration-300 hover:bg-[#54200f]">
+                Go to Checkout
+                <ArrowRight size={14} />
+              </Link>
+
+              <p className="mt-3 text-center text-[9px] leading-4 text-[#a29387]">
+                Taxes and shipping are calculated at checkout.
+              </p>
             </div>
-
-            {/* Total */}
-            <div className="mt-6 flex items-center justify-between border-t border-[#e8e0d8] pt-6">
-              <span className="text-base font-semibold text-[#2d211b]">
-                Total
-              </span>
-
-              <span className="text-2xl font-semibold tracking-tight text-[#2d211b]">
-                $25.00
-              </span>
-            </div>
-
-            {/* Checkout */}
-            <Link
-              to="/checkout"
-              className="mt-7 flex h-12 w-full items-center justify-center bg-[#2d211b] text-sm font-medium text-white transition hover:bg-[#40312a]">
-              Proceed to Checkout
-            </Link>
-
-            <p className="mt-4 text-center text-[11px] leading-5 text-[#a0948b]">
-              Taxes and shipping are calculated at checkout.
-            </p>
           </aside>
         </div>
 
-        {/* Trust / Bottom Info */}
-        <div className="mt-16 grid grid-cols-1 gap-6 border-t border-[#e8e0d8] pt-8 sm:grid-cols-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#5d4b3e]">
-              Freshly Roasted
-            </p>
+        {/* NEWSLETTER */}
+        <section className="relative mt-16 overflow-hidden rounded-[18px] bg-[#431b0d] px-6 py-7 sm:px-10 sm:py-9">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[#d88d48] opacity-20 blur-[80px]" />
 
-            <p className="mt-2 text-xs leading-5 text-[#9d9289]">
-              Carefully selected and roasted for a better cup.
-            </p>
+          <div className="pointer-events-none absolute -bottom-24 left-20 h-40 w-40 rounded-full bg-[#a05f38] opacity-20 blur-[70px]" />
+
+          <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="mb-2 text-[9px] font-semibold uppercase tracking-[0.22em] text-[#d8a87d]">
+                STAY IN THE LOOP
+              </p>
+
+              <h2 className="max-w-md text-2xl font-medium leading-tight tracking-[-0.03em] text-[#fffaf2] sm:text-3xl">
+                Stay connected with our latest coffee drops.
+              </h2>
+            </div>
+
+            <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-[#fffaf2] px-5 text-xs text-[#3a1407] outline-none placeholder:text-[#9b8a7d]"
+              />
+
+              <button
+                type="button"
+                className="h-11 rounded-full bg-[#d88d48] px-6 text-[10px] font-semibold text-[#3a1407] transition-colors hover:bg-[#e3a365]">
+                Subscribe
+              </button>
+            </div>
           </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#5d4b3e]">
-              Secure Checkout
-            </p>
-
-            <p className="mt-2 text-xs leading-5 text-[#9d9289]">
-              Your information is protected throughout your purchase.
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#5d4b3e]">
-              Need Help?
-            </p>
-
-            <p className="mt-2 text-xs leading-5 text-[#9d9289]">
-              We're here if you need help with your order.
-            </p>
-          </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 };
 
