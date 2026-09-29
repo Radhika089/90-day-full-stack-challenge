@@ -52,6 +52,21 @@ const productSchema = new mongoose.Schema(
       max: 5,
     },
 
+    type: {
+      type: String,
+      trim: true,
+    },
+
+    roast: {
+      type: String,
+      trim: true,
+    },
+
+    origin: {
+      type: String,
+      trim: true,
+    },
+
     reviewCount: {
       type: Number,
       default: 0,

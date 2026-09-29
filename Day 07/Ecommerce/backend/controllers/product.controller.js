@@ -1,7 +1,17 @@
 import productModel from "../models/product.js";
 
 export async function createProduct(req, res) {
-  const { name, description, price, category, stock, brand } = req.body;
+  const {
+    name,
+    description,
+    price,
+    category,
+    stock,
+    brand,
+    type,
+    origin,
+    roast,
+  } = req.body;
 
   if (
     !name ||
@@ -35,6 +45,9 @@ export async function createProduct(req, res) {
       image: req.file.path,
       stock,
       brand,
+      type,
+      origin,
+      roast,
     });
 
     res.status(201).json({
