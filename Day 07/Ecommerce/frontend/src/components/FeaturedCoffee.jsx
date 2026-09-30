@@ -1,4 +1,36 @@
+import { useEffect } from "react";
+import { getProducts } from "../api/productApi";
+import { useState } from "react";
+import Skelton from "./Skelton";
+import { addToCart } from "../api/cartApi";
+
 const FeaturedCoffee = () => {
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const fetchFeaturedProduct = async () => {
+      try {
+        const data = await getProducts();
+        setProduct(data.products[0]);
+      } catch (error) {
+        console.error("Failed to fetch featured product:", error);
+      }
+    };
+    fetchFeaturedProduct();
+  }, []);
+
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(product._id, 1);
+    } catch (error) {
+      console.error("Failed to add in cart:", error);
+    }
+  };
+
+  if (!product) {
+    return <Skelton />;
+  }
+
   return (
     <section className="relative min-h-[700px] overflow-hidden bg-[#fff6e5] font-sans">
       <div className="pointer-events-none absolute -top-24 left-1/2 z-0 h-[380px] w-[500px] -translate-x-1/2 rounded-full bg-[#e9b06d] opacity-[0.20] blur-[80px] sm:-top-32 sm:h-[450px] sm:w-[600px] md:h-[500px] md:w-[700px] md:blur-[100px]" />
@@ -76,7 +108,7 @@ const FeaturedCoffee = () => {
           {/* Product image */}
 
           <img
-            src="/product.webp"
+            src={product.image}
             alt="Whole Bean Coffee — Medium Roast"
             className="relative z-20 h-[300px] w-[225px] rotate-[-4deg] rounded-[18px] object-cover shadow-2xl shadow-black/30 sm:h-[340px] sm:w-[255px] md:h-[390px] md:w-[290px]"
           />
@@ -98,12 +130,11 @@ const FeaturedCoffee = () => {
           </p>
 
           <h2 className="mt-2 text-3xl font-medium text-[#fff6e5] sm:text-4xl md:text-5xl">
-            Medium Roast Whole Bean
+            {product.name}
           </h2>
 
           <p className="mt-4 text-sm leading-6 text-[#d8b9a2] sm:text-base sm:leading-7">
-            Notes of caramel and toasted hazelnut, roasted in small batches and
-            shipped within 48 hours of roasting. Best brewed within 3 weeks.
+            {product.description}
           </p>
 
           {/* Rating */}
@@ -111,7 +142,9 @@ const FeaturedCoffee = () => {
           <div className="mt-4 flex items-center justify-center gap-2 md:justify-start">
             <span className="text-sm tracking-wide text-[#e4a15d]">★★★★★</span>
 
-            <span className="text-xs text-[#c9a995]">4.8 · 124 reviews</span>
+            <span className="text-xs text-[#c9a995]">
+              {product.rating} · {product.reviewCount} reviews
+            </span>
           </div>
 
           {/* Price + Cart */}
@@ -119,13 +152,15 @@ const FeaturedCoffee = () => {
           <div className="mt-6 flex items-center justify-center gap-5 md:justify-start">
             <div>
               <p className="text-2xl font-semibold text-[#fff6e5] sm:text-3xl">
-                ₹475
+                ₹{product.price}
               </p>
 
               <p className="text-xs text-[#b99581]">250g</p>
             </div>
 
-            <button className="rounded-full bg-[#e09a54] px-6 py-3 text-xs font-semibold text-[#431b0d] shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:bg-[#efad65] sm:px-7 sm:py-3.5 sm:text-sm">
+            <button
+              className="rounded-full bg-[#e09a54] px-6 py-3 text-xs font-semibold text-[#431b0d] shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-1 hover:bg-[#efad65] sm:px-7 sm:py-3.5 sm:text-sm"
+              onClick={handleAddToCart}>
               Add to cart
             </button>
           </div>
