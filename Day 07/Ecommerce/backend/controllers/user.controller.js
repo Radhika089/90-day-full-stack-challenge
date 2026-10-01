@@ -67,6 +67,8 @@ export async function login(req, res) {
   try {
     const user = await userModel.findOne({ email });
 
+    console.log("USER:", user);
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -95,6 +97,48 @@ export async function login(req, res) {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function logout(req, res) {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export async function me(req, res) {
+  try {
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+
     return res.status(500).json({
       success: false,
       message: error.message,

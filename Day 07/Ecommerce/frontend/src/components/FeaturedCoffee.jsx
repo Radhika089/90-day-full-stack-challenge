@@ -5,19 +5,35 @@ import Skelton from "./Skelton";
 import { addToCart } from "../api/cartApi";
 
 const FeaturedCoffee = () => {
-  const [product, setProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [filter, setFilter] = useState(null);
 
   useEffect(() => {
     const fetchFeaturedProduct = async () => {
       try {
         const data = await getProducts();
-        setProduct(data.products[0]);
+        setProducts(data.products);
       } catch (error) {
         console.error("Failed to fetch featured product:", error);
       }
     };
     fetchFeaturedProduct();
   }, []);
+
+  const filteredProducts = products.filter((product) => {
+    if (!filter) return true;
+
+    if (filter === "Light Roast") return product.roast === "Light";
+    if (filter === "Medium Roast") return product.roast === "Medium";
+    if (filter === "Dark Roast") return product.roast === "Dark";
+    if (filter === "Cold Brew") return product.type === "Cold Brew";
+    if (filter === "Decaf") return product.type === "Decaf";
+    if (filter === "Whole Bean") return product.type === "Whole Bean";
+
+    return true;
+  });
+
+  const product = filteredProducts[0];
 
   const handleAddToCart = async () => {
     try {
@@ -27,8 +43,16 @@ const FeaturedCoffee = () => {
     }
   };
 
-  if (!product) {
+  if (products.length === 0) {
     return <Skelton />;
+  }
+
+  if (!product) {
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <p className="text-[#431b0d]">No products found.</p>
+      </div>
+    );
   }
 
   return (
@@ -82,7 +106,8 @@ const FeaturedCoffee = () => {
               label === "Medium Roast"
                 ? "bg-[#d88d48] text-[#431b0d]"
                 : "bg-[#fff6e5] text-[#431b0d]"
-            }`}>
+            }`}
+            onClick={() => setFilter(label)}>
             {label}
           </button>
         ))}

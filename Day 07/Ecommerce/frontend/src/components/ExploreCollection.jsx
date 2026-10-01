@@ -1,9 +1,23 @@
-import React from "react";
 import { ArrowUpRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import products from "../utils/constant";
+import { getProducts } from "../api/productApi";
 
 const ExploreCollection = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data.products);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const collections = [
     {
       name: "Brews",

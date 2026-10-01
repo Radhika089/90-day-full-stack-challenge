@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -7,14 +7,39 @@ import {
   Check,
   ArrowLeft,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getCurrentUser, loginUser } from "../api/authApi";
 
 const Login = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      const data = await loginUser({
+        email: formData.email,
+        password: formData.password,
+      });
+      console.log(data);
+
+      if (data.success) {
+        const currentUser = await getCurrentUser();
+        console.log("CURRENT USER:", currentUser);
+
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
     console.log("Login submitted");
   };
 
@@ -179,6 +204,10 @@ const Login = () => {
                 <input
                   id="email"
                   type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder="you@example.com"
                   required
                   className="h-[49px] w-full rounded-xl border border-[#dfd0be] bg-[#fffaf2] px-4 text-sm text-[#3a1407] outline-none transition-all duration-300 placeholder:text-[#b49a87] focus:border-[#9f6748] focus:bg-white focus:ring-4 focus:ring-[#b96447]/5"
@@ -205,6 +234,10 @@ const Login = () => {
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     placeholder="Enter your password"
                     required
                     className="h-[49px] w-full rounded-xl border border-[#dfd0be] bg-[#fffaf2] px-4 pr-12 text-sm text-[#3a1407] outline-none transition-all duration-300 placeholder:text-[#b49a87] focus:border-[#9f6748] focus:bg-white focus:ring-4 focus:ring-[#b96447]/5"

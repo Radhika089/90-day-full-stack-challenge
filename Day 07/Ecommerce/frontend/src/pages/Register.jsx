@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -7,15 +7,51 @@ import {
   Check,
   ArrowLeft,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../api/authApi";
 
 const Register = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      console.log("Passwords do not match");
+      return;
+    }
+
+    if (!agreeTerms) {
+      console.log("Please accept the terms");
+      return;
+    }
+
+    try {
+      const data = await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      console.log(data);
+
+      if (data.success) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
     console.log("Registration submitted");
   };
 
@@ -188,6 +224,10 @@ const Register = () => {
                 <input
                   id="name"
                   type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="Your name"
                   required
                   className="h-[42px] w-full rounded-xl border border-[#dfd0be] bg-[#fffaf2] px-4 text-xs text-[#3a1407] outline-none transition-all duration-300 placeholder:text-[#b49a87] focus:border-[#9f6748] focus:bg-white focus:ring-4 focus:ring-[#b96447]/5"
@@ -205,6 +245,10 @@ const Register = () => {
                 <input
                   id="email"
                   type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder="you@example.com"
                   required
                   className="h-[42px] w-full rounded-xl border border-[#dfd0be] bg-[#fffaf2] px-4 text-xs text-[#3a1407] outline-none transition-all duration-300 placeholder:text-[#b49a87] focus:border-[#9f6748] focus:bg-white focus:ring-4 focus:ring-[#b96447]/5"
@@ -223,6 +267,10 @@ const Register = () => {
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     placeholder="Create a password"
                     required
                     minLength={6}
@@ -255,6 +303,13 @@ const Register = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Repeat your password"
                     required
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     minLength={6}
                     className="h-[42px] w-full rounded-xl border border-[#dfd0be] bg-[#fffaf2] px-4 pr-11 text-xs text-[#3a1407] outline-none transition-all duration-300 placeholder:text-[#b49a87] focus:border-[#9f6748] focus:bg-white focus:ring-4 focus:ring-[#b96447]/5"
                   />
@@ -289,7 +344,7 @@ const Register = () => {
                   {agreeTerms && <Check size={9} className="text-white" />}
                 </span>
 
-                <span className="text-[9px] leading-4 text-[#806657]">
+                <span className="text-[10px] leading-4 text-[#806657]">
                   I agree to Aura Coffee's{" "}
                   <Link
                     to="/terms"
