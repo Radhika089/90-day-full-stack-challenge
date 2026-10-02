@@ -11,7 +11,7 @@ export const getWishlist = async () => {
 };
 
 export const removeFromWishlist = async (productId) => {
-  const response = await api.delete("/wishlist/product", { data: productId });
+  const response = await api.delete(`/wishlist/product/${productId}`);
 
   return response.data;
 };

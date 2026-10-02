@@ -1,11 +1,40 @@
 import { Heart, ShoppingBag, Star } from "lucide-react";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { addToCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
+import {
+  addToWishlist,
+  getWishlist,
+  removeFromWishlist,
+} from "../api/wishlistApi";
 
 const Product = ({ product }) => {
   const { user } = useContext(AuthContext);
+  const [isWishListed, setIsWishListed] = useState(false);
+
+  useEffect(() => {
+    const checkWishlist = async () => {
+      if (!user) {
+        setIsWishListed(false);
+        return;
+      }
+
+      try {
+        const data = await getWishlist();
+
+        const exists = data.wishlist.products.some(
+          (item) => item._id === product._id,
+        );
+
+        setIsWishListed(exists);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    checkWishlist();
+  }, [user, product._id]);
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -19,6 +48,27 @@ const Product = ({ product }) => {
       console.log(data);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
+    }
+  };
+
+  const handleAddToWishlist = async () => {
+    if (!user) {
+      console.log("Please login to add products to wishlist");
+      return;
+    }
+
+    try {
+      if (isWishListed) {
+        await removeFromWishlist(product._id);
+        setIsWishListed(false);
+        console.log("Product removed from wishlist");
+      } else {
+        await addToWishlist(product._id);
+        setIsWishListed(true);
+        console.log("Product added to wishlist");
+      }
+    } catch (error) {
+      console.log("Wishlist error:", error.response?.data);
     }
   };
 
@@ -40,9 +90,13 @@ const Product = ({ product }) => {
         {/* Wishlist */}
         <button
           type="button"
-          onClick={(e) => e.preventDefault()}
+          onClick={handleAddToWishlist}
           className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-[#e2d0ba] bg-[#fffaf2]/90 text-[#5c3929] shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-[#3a1407] hover:text-white">
-          <Heart size={15} strokeWidth={1.7} />
+          <Heart
+            size={15}
+            fill={isWishListed ? "currentColor" : "none"}
+            strokeWidth={1.7}
+          />
         </button>
 
         {/* Product Image */}
@@ -69,7 +123,7 @@ const Product = ({ product }) => {
       </div>
 
       {/* Product Information */}
-      <Link to={`/products/${product.id}`}>
+      <Link to={`/products/${product._id}`}>
         <div className="px-1 pt-4">
           {/* Category + Rating */}
           <div className="flex items-center justify-between">

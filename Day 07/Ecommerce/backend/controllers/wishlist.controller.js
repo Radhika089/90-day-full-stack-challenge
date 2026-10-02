@@ -94,7 +94,7 @@ export async function getWishlist(req, res) {
 }
 
 export async function removeFromWishlist(req, res) {
-  const { productId } = req.body;
+  const { productId } = req.params;
 
   if (!productId) {
     return res.status(400).json({

@@ -13,6 +13,12 @@ import { Link, useParams } from "react-router-dom";
 import { getProducts, getSingleProduct } from "../api/productApi";
 import { addToCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
+import {
+  addToWishlist,
+  getWishlist,
+  removeFromWishlist,
+} from "../api/wishlistApi";
+import Product from "../components/Product";
 
 const ProductDetails = () => {
   const { user } = useContext(AuthContext);
@@ -33,8 +39,27 @@ const ProductDetails = () => {
       const allProducts = await getProducts();
       setProducts(allProducts.products);
     };
+
+    const checkWishlist = async () => {
+      if (!user) {
+        setIsWishListed(false);
+        return;
+      }
+
+      try {
+        const data = await getWishlist();
+
+        const exists = data.wishlist.products.some(
+          (item) => item._id === productId,
+        );
+
+        setIsWishListed(exists);
+      } catch (error) {}
+    };
+
     fetchProduct();
-  }, [productId]);
+    checkWishlist();
+  }, [user, productId]);
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -49,6 +74,25 @@ const ProductDetails = () => {
     } catch (error) {
       console.error("Failed to add product to cart:", error);
     }
+  };
+
+  const handleAddToWishlisList = async () => {
+    if (!user) {
+      console.log("Please login to add products in wishlist");
+      return;
+    }
+
+    try {
+      if (isWishListed) {
+        await removeFromWishlist(productId);
+        setIsWishListed(false);
+        return;
+      } else {
+        await addToWishlist(productId);
+        setIsWishListed(true);
+        return;
+      }
+    } catch (error) {}
   };
 
   const relatedProducts = product
@@ -114,7 +158,7 @@ const ProductDetails = () => {
                 />
 
                 <button
-                  onClick={() => setIsWishListed(!isWishListed)}
+                  onClick={handleAddToWishlisList}
                   className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition ${isWishListed ? "border-[#b87543] bg-[#fff6e5] text-[#9a4f28]" : "border-[#dfcdb8] bg-[#fffaf2]/90 text-[#76584a] hover:bg-white"}`}>
                   <Heart
                     size={17}
@@ -282,53 +326,7 @@ const ProductDetails = () => {
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
               {relatedProducts.map((item) => (
-                <Link
-                  key={item._id}
-                  to={`/products/${item._id}`}
-                  className="group">
-                  <div className="relative overflow-hidden rounded-[12px] bg-[#e9dbc8]">
-                    <div className="aspect-[0.88] overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-
-                    <button
-                      onClick={(e) => e.preventDefault()}
-                      className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-[#fffaf2]/90 text-[#6d5141] backdrop-blur-sm transition hover:bg-white">
-                      <Heart size={14} />
-                    </button>
-                  </div>
-
-                  <div className="pt-4">
-                    <div className="flex items-center gap-1.5">
-                      <Star
-                        size={11}
-                        fill="currentColor"
-                        className="text-[#b87543]"
-                      />
-                      <span className="text-[11px] text-[#76584a]">
-                        {item.rating}
-                      </span>
-                    </div>
-
-                    <div className="mt-1.5 flex items-start justify-between gap-2">
-                      <h3 className="text-sm font-semibold text-[#3a1407] transition-colors group-hover:text-[#9a4f28]">
-                        {item.name}
-                      </h3>
-
-                      <span className="shrink-0 text-sm font-semibold text-[#3a1407]">
-                        ₹{item.price.toFixed(0)}
-                      </span>
-                    </div>
-
-                    <p className="mt-1.5 line-clamp-1 text-[11px] text-[#806858]">
-                      {item.description}
-                    </p>
-                  </div>
-                </Link>
+                <Product key={item._id} product={item} />
               ))}
             </div>
           </div>
