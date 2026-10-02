@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -12,8 +12,10 @@ import {
 import { Link, useParams } from "react-router-dom";
 import { getProducts, getSingleProduct } from "../api/productApi";
 import { addToCart } from "../api/cartApi";
+import { AuthContext } from "../context/AuthContext";
 
 const ProductDetails = () => {
+  const { user } = useContext(AuthContext);
   const { productId } = useParams();
 
   const [product, setProduct] = useState(null);
@@ -35,6 +37,11 @@ const ProductDetails = () => {
   }, [productId]);
 
   const handleAddToCart = async () => {
+    if (!user) {
+      console.log("Please login to add products to cart");
+      return;
+    }
+
     try {
       const data = await addToCart(product._id, quantity);
 

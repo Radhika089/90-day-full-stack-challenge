@@ -1,10 +1,18 @@
 import { Heart, ShoppingBag, Star } from "lucide-react";
-import { useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { addToCart } from "../api/cartApi";
+import { AuthContext } from "../context/AuthContext";
 
 const Product = ({ product }) => {
+  const { user } = useContext(AuthContext);
+
   const handleAddToCart = async () => {
+    if (!user) {
+      console.log("Please login to add products to cart");
+      return;
+    }
+
     try {
       const data = await addToCart(product._id, 1);
 
