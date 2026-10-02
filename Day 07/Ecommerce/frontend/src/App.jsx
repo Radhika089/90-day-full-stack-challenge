@@ -12,6 +12,7 @@ import Register from "./pages/Register";
 import MainLayout from "./layout/MainLayout";
 import Wishlist from "./pages/Wishlist";
 import ScrollToTop from "./components/ScrollToTop";
+import Profile from "./pages/Profile";
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </>

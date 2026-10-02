@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Search,
   ShoppingBag,
@@ -8,11 +8,16 @@ import {
   X,
   ArrowRight,
 } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
-import { useEffect } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { getCart, updateCart, removeFromCart } from "../api/cartApi";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
+  const { user, loading, logout } = useContext(AuthContext);
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const navigate = useNavigate();
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -27,6 +32,7 @@ const Navbar = () => {
         console.error("Failed to fetch cart:", error);
       }
     };
+
     fetchCart();
   }, []);
 
@@ -46,6 +52,12 @@ const Navbar = () => {
     } catch (error) {
       console.error("Failed to remove item from cart:", error);
     }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setProfileOpen(false);
+    navigate("/");
   };
 
   const subtotal =
@@ -68,31 +80,26 @@ const Navbar = () => {
 
   return (
     <>
-      {/* ================= NAVBAR ================= */}
-      <nav className="sticky top-0 z-50 border-b border-[#e8e0d7] bg-[#fdfbf7] text-[#1f2f2e]">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+      <nav className="sticky top-0 z-40 border-b border-[#eadfd3] bg-[#fffaf2]">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
           {/* Logo */}
           <Link
             to="/"
-            className="leading-none transition-opacity hover:opacity-70">
-            <h2 className="text-2xl font-black tracking-[0.2em]">AURA</h2>
-
-            <span className="block text-[10px] tracking-[0.18em] text-[#1f2f2e]/60">
-              COFFEE CO.
-            </span>
+            className="text-2xl font-semibold tracking-wide text-[#3a1407]">
+            AURA
           </Link>
 
-          {/* ================= DESKTOP NAVIGATION ================= */}
+          {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 md:flex">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `relative text-sm font-medium transition-colors ${
+                  `text-sm transition-colors ${
                     isActive
-                      ? "text-[#1f2f2e]"
-                      : "text-[#1f2f2e]/60 hover:text-[#1f2f2e]"
+                      ? "font-medium text-[#9a4f28]"
+                      : "text-[#5c3929] hover:text-[#9a4f28]"
                   }`
                 }>
                 {item.name}
@@ -100,250 +107,333 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* ================= RIGHT ACTIONS ================= */}
-          <div className="flex items-center gap-5">
+          {/* Desktop Actions */}
+          <div className="hidden items-center gap-2 sm:flex">
             {/* Search */}
-            <div
-              className={`flex items-center border-b border-[#1f2f2e]/30 transition-all duration-300 ${
-                searchOpen ? "w-48" : "w-5"
-              }`}>
-              <button
-                type="button"
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="shrink-0 transition-colors hover:text-[#9a7658]"
-                aria-label="Search">
-                {searchOpen ? (
-                  <X size={20} strokeWidth={1.8} />
-                ) : (
-                  <Search size={20} strokeWidth={1.8} />
-                )}
-              </button>
-
+            <div className="relative flex items-center">
               {searchOpen && (
                 <input
                   type="text"
                   autoFocus
-                  placeholder="Search..."
-                  className="ml-3 w-full bg-transparent pb-1 text-sm text-[#1f2f2e] outline-none placeholder:text-[#1f2f2e]/40"
+                  placeholder="Search coffee..."
+                  className="mr-2 w-40 rounded-full border border-[#e5d7c7] bg-white px-4 py-2 text-sm outline-none focus:border-[#b96447]"
                 />
               )}
+
+              <button
+                type="button"
+                onClick={() => setSearchOpen((prev) => !prev)}
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f3e5d3]"
+                aria-label="Search">
+                <Search size={20} strokeWidth={1.8} />
+              </button>
             </div>
 
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="hidden transition-colors hover:text-[#9a7658] sm:block"
+              className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f3e5d3]"
               aria-label="Wishlist">
               <Heart size={20} strokeWidth={1.8} />
             </Link>
+
+            {/* Account */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setProfileOpen((prev) => !prev)}
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f3e5d3]"
+                aria-label="Account">
+                <User size={20} strokeWidth={1.8} />
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-[#e5d7c7] bg-[#fffaf2] p-3 shadow-lg">
+                  {loading ? (
+                    <div className="px-3 py-2 text-sm text-[#806858]">
+                      Loading...
+                    </div>
+                  ) : user ? (
+                    <>
+                      <div className="border-b border-[#e5d7c7] px-3 pb-3">
+                        <p className="text-sm font-semibold text-[#3a1407]">
+                          {user.name}
+                        </p>
+
+                        <p className="mt-1 text-xs text-[#806858]">
+                          {user.email}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileOpen(false);
+                          navigate("/profile");
+                        }}
+                        className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm text-[#5c3929] transition hover:bg-[#f3e5d3]">
+                        Your Profile
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-[#9a4f28] transition hover:bg-[#f3e5d3]">
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="px-3 pb-2 text-xs text-[#806858]">
+                        Welcome to AURA
+                      </p>
+
+                      <Link
+                        to="/login"
+                        onClick={() => setProfileOpen(false)}
+                        className="block w-full rounded-lg px-3 py-2 text-sm text-[#5c3929] transition hover:bg-[#f3e5d3]">
+                        Login
+                      </Link>
+
+                      <Link
+                        to="/register"
+                        onClick={() => setProfileOpen(false)}
+                        className="block w-full rounded-lg px-3 py-2 text-sm text-[#5c3929] transition hover:bg-[#f3e5d3]">
+                        Register
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Cart */}
             <button
               type="button"
               onClick={() => setCartOpen(true)}
-              className="relative transition-colors hover:text-[#9a7658]"
-              aria-label="Shopping cart">
+              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f3e5d3]"
+              aria-label="Cart">
               <ShoppingBag size={20} strokeWidth={1.8} />
 
-              {/* Temporary cart count */}
-              <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#b96447] text-[9px] font-semibold text-white">
-                {cart?.items.length || 0}
-              </span>
+              {cart?.items?.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#b96447] px-1 text-[10px] text-white">
+                  {cart.items.length}
+                </span>
+              )}
             </button>
+          </div>
 
-            {/* Account */}
-            <Link
-              to="/login"
-              className="hidden transition-colors hover:text-[#9a7658] sm:block"
-              aria-label="Account">
-              <User size={20} strokeWidth={1.8} />
-            </Link>
-
-            {/* Mobile Menu Button */}
+          {/* Mobile Actions */}
+          <div className="flex items-center gap-2 sm:hidden">
             <button
               type="button"
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="transition-colors hover:text-[#9a7658] md:hidden"
-              aria-label="Menu">
-              {menuOpen ? (
-                <X size={22} strokeWidth={1.8} />
-              ) : (
-                <Menu size={22} strokeWidth={1.8} />
+              onClick={() => setCartOpen(true)}
+              className="relative flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#f3e5d3]"
+              aria-label="Cart">
+              <ShoppingBag size={20} strokeWidth={1.8} />
+
+              {cart?.items?.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#b96447] px-1 text-[10px] text-white">
+                  {cart.items.length}
+                </span>
               )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#f3e5d3]"
+              aria-label="Menu">
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        {/* ================= MOBILE MENU ================= */}
+        {/* Mobile Menu */}
         {menuOpen && (
-          <div className="border-t border-[#e8e0d7] bg-[#fdfbf7] md:hidden">
-            <div className="px-6 py-6">
-              {/* Main Links */}
-              <div className="flex flex-col">
-                {navItems.map((item) => (
-                  <NavLink
-                    key={item.name}
-                    to={item.path}
-                    onClick={closeMobileMenu}
-                    className={({ isActive }) =>
-                      `border-b border-[#e8e0d7] py-4 text-sm font-medium transition-colors ${
-                        isActive
-                          ? "text-[#1f2f2e]"
-                          : "text-[#1f2f2e]/60 hover:text-[#1f2f2e]"
-                      }`
-                    }>
-                    {item.name}
-                  </NavLink>
-                ))}
-              </div>
-
-              {/* Mobile Extra Links */}
-              <div className="mt-5 flex items-center gap-6">
-                <Link
-                  to="/wishlist"
+          <div className="border-t border-[#eadfd3] bg-[#fffaf2] px-6 py-5 sm:hidden">
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.path}
                   onClick={closeMobileMenu}
-                  className="flex items-center gap-2 text-xs text-[#1f2f2e]/60 transition hover:text-[#1f2f2e]">
-                  <Heart size={16} strokeWidth={1.8} />
-                  Wishlist
-                </Link>
+                  className="rounded-lg px-3 py-3 text-sm text-[#5c3929] hover:bg-[#f3e5d3]">
+                  {item.name}
+                </NavLink>
+              ))}
 
+              <Link
+                to="/wishlist"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm text-[#5c3929] hover:bg-[#f3e5d3]">
+                <Heart size={18} />
+                Wishlist
+              </Link>
+
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/profile");
+                  }}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-[#5c3929] hover:bg-[#f3e5d3]">
+                  <User size={18} />
+                  Account
+                </button>
+              ) : (
                 <Link
                   to="/login"
                   onClick={closeMobileMenu}
-                  className="flex items-center gap-2 text-xs text-[#1f2f2e]/60 transition hover:text-[#1f2f2e]">
-                  <User size={16} strokeWidth={1.8} />
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm text-[#5c3929] hover:bg-[#f3e5d3]">
+                  <User size={18} />
                   Account
                 </Link>
-              </div>
+              )}
+
+              {user && (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-[#9a4f28] hover:bg-[#f3e5d3]">
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         )}
       </nav>
 
-      {/* ================= CART DRAWER ================= */}
+      {/* Cart Drawer */}
       {cartOpen && (
-        <>
-          {/* Overlay */}
+        <div className="fixed inset-0 z-50">
           <div
+            className="absolute inset-0 bg-black/30"
             onClick={() => setCartOpen(false)}
-            className="fixed inset-0 z-[60] bg-[#1f2f2e]/30"
           />
 
-          {/* Drawer */}
-          <aside className="fixed right-0 top-0 z-[70] flex h-full w-full max-w-sm flex-col bg-[#fdfbf7] text-[#2d211b] shadow-2xl">
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-[#e6ddd5] px-6 py-5">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9a7658]">
-                  Your Selection
-                </p>
-
-                <h2 className="mt-1 text-xl font-semibold">Your Cart</h2>
-              </div>
+          <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-[#fffaf2] shadow-xl">
+            <div className="flex items-center justify-between border-b border-[#eadfd3] px-6 py-5">
+              <h2 className="text-lg font-semibold text-[#3a1407]">
+                Your Cart
+              </h2>
 
               <button
                 type="button"
                 onClick={() => setCartOpen(false)}
-                className="text-[#6f6259] transition hover:text-[#2d211b]"
-                aria-label="Close cart">
-                <X size={20} strokeWidth={1.8} />
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#f3e5d3]">
+                <X size={20} />
               </button>
             </div>
 
-            {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto px-6 py-6">
-              {cart?.items.map(({ product, quantity }) => (
-                <div
-                  key={product._id}
-                  className="flex gap-4 border-b border-[#e6ddd5] py-5">
-                  <div className="h-20 w-20 shrink-0 overflow-hidden bg-[#e9dfd5]">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {!cart?.items?.length ? (
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <ShoppingBag
+                    size={42}
+                    strokeWidth={1.4}
+                    className="text-[#9a7658]"
+                  />
 
-                  <div className="flex-1">
-                    <div className="flex justify-between gap-3">
-                      <div>
-                        <h3 className="text-sm font-medium">{product.name}</h3>
+                  <p className="mt-4 text-sm text-[#806858]">
+                    Your cart is empty.
+                  </p>
 
-                        <p className="mt-1 text-xs text-[#8d8178]">
-                          {product.category}
-                        </p>
-                      </div>
-
-                      <p className="text-sm font-medium">₹{product.price}</p>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between">
-                      {/* Quantity */}
-                      <div className="flex items-center border border-[#d8cfc7]">
-                        <button
-                          className="px-3 py-1 text-sm transition hover:bg-[#eee7df]"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              product._id,
-                              Math.max(1, quantity - 1),
-                            )
-                          }>
-                          −
-                        </button>
-
-                        <span className="border-x border-[#d8cfc7] px-3 py-1 text-xs">
-                          {quantity}
-                        </span>
-
-                        <button
-                          className="px-3 py-1 text-sm transition hover:bg-[#eee7df]"
-                          onClick={() =>
-                            handleUpdateQuantity(product._id, quantity + 1)
-                          }>
-                          +
-                        </button>
-                      </div>
-
-                      <button
-                        className="text-[10px] text-[#9a7658] transition hover:text-[#2d211b]"
-                        onClick={() => handleRemoveItem(product._id)}>
-                        Remove
-                      </button>
-                    </div>
-                  </div>
+                  <Link
+                    to="/shop"
+                    onClick={() => setCartOpen(false)}
+                    className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#3a1407] px-5 py-3 text-sm text-white">
+                    Shop Coffee
+                    <ArrowRight size={16} />
+                  </Link>
                 </div>
-              ))}
+              ) : (
+                <div className="space-y-5">
+                  {cart.items.map((item) => (
+                    <div
+                      key={item.product._id}
+                      className="flex gap-4 border-b border-[#eadfd3] pb-5">
+                      <img
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="h-20 w-20 rounded-lg object-cover"
+                      />
+
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-sm font-medium text-[#3a1407]">
+                          {item.product.name}
+                        </h3>
+
+                        <p className="mt-1 text-sm text-[#806858]">
+                          ₹{item.product.price}
+                        </p>
+
+                        <div className="mt-3 flex items-center justify-between">
+                          <div className="flex items-center rounded-lg border border-[#e5d7c7]">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateQuantity(
+                                  item.product._id,
+                                  Math.max(1, item.quantity - 1),
+                                )
+                              }
+                              className="px-3 py-1 text-sm">
+                              -
+                            </button>
+
+                            <span className="px-2 text-sm">
+                              {item.quantity}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateQuantity(
+                                  item.product._id,
+                                  item.quantity + 1,
+                                )
+                              }
+                              className="px-3 py-1 text-sm">
+                              +
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(item.product._id)}
+                            className="text-xs text-[#9a4f28]">
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Drawer Footer */}
-            <div className="border-t border-[#e6ddd5] px-6 py-6">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-[#6f6259]">Subtotal</span>
+            {cart?.items?.length > 0 && (
+              <div className="border-t border-[#eadfd3] px-6 py-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="text-sm text-[#806858]">Subtotal</span>
+                  <span className="font-semibold text-[#3a1407]">
+                    ₹{subtotal}
+                  </span>
+                </div>
 
-                <span className="text-lg font-semibold">₹{subtotal}</span>
+                <Link
+                  to="/cart"
+                  onClick={() => setCartOpen(false)}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#3a1407] px-5 py-3 text-sm text-white transition hover:bg-[#5c2410]">
+                  View Cart
+                  <ArrowRight size={16} />
+                </Link>
               </div>
-
-              <p className="mt-2 text-[10px] leading-5 text-[#a0948b]">
-                Shipping and taxes calculated at checkout.
-              </p>
-
-              <Link
-                to="/cart"
-                onClick={() => setCartOpen(false)}
-                className="mt-5 flex h-12 items-center justify-center gap-2 rounded-full border border-[#2d211b]/25 text-sm font-medium transition hover:border-[#2d211b] hover:bg-[#f1ebe4]">
-                View Cart
-                <ArrowRight size={15} />
-              </Link>
-
-              <Link
-                to="/checkout"
-                onClick={() => setCartOpen(false)}
-                className="mt-3 flex h-12 items-center justify-center rounded-full bg-[#2d211b] text-sm font-medium text-white transition hover:bg-[#40312a]">
-                Checkout
-              </Link>
-            </div>
-          </aside>
-        </>
+            )}
+          </div>
+        </div>
       )}
     </>
   );
