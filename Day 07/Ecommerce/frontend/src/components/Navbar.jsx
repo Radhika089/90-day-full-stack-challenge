@@ -11,6 +11,7 @@ import {
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { getCart, updateCart, removeFromCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
+import { getWishlist } from "../api/wishlistApi";
 
 const Navbar = () => {
   const { user, loading, logout } = useContext(AuthContext);
@@ -22,6 +23,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState(null);
+  const [wishlist, setWishlist] = useState(null);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -35,6 +37,25 @@ const Navbar = () => {
 
     fetchCart();
   }, []);
+
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      if (!user) {
+        setWishlist(null);
+        return;
+      }
+
+      try {
+        const data = await getWishlist();
+        setWishlist(data.wishlist);
+      } catch (error) {
+        console.log("Failed to fetch wishlist:", error);
+        setWishlist(null);
+      }
+    };
+
+    fetchWishlist();
+  }, [user]);
 
   const handleUpdateQuantity = async (productId, newQuantity) => {
     try {
@@ -132,9 +153,14 @@ const Navbar = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f3e5d3]"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-[#f3e5d3]"
               aria-label="Wishlist">
-              <Heart size={20} strokeWidth={1.8} />
+              <Heart size={20} strokeWidth={1.8} />{" "}
+              {wishlist?.products?.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#b96447] px-1 text-[10px] text-white">
+                  {wishlist.products.length}
+                </span>
+              )}
             </Link>
 
             {/* Account */}

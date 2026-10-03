@@ -1,12 +1,64 @@
-import React from "react";
-import { ArrowLeft, Heart, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowLeft, Heart, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
-import products from "../utils/constant";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { getWishlist, removeFromWishlist } from "../api/wishlistApi";
+import { addToCart } from "../api/cartApi";
 
 const Wishlist = () => {
-  // Temporary wishlist data.
-  // Replace this with your backend wishlist data later.
-  const wishlistProducts = products.slice(0, 4);
+  const { user } = useContext(AuthContext);
+
+  const [wishlistProducts, setWishlistProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!user) {
+        setWishlistProducts([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const data = await getWishlist();
+
+        setWishlistProducts(data.wishlist?.products || []);
+      } catch (error) {
+        console.log("Wishlist error:", error);
+        setWishlistProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [user]);
+
+  const handleRemoveWishlist = async (productId) => {
+    try {
+      await removeFromWishlist(productId);
+
+      setWishlistProducts((prev) =>
+        prev.filter((item) => item._id !== productId),
+      );
+    } catch (error) {
+      console.log("Remove wishlist error:", error);
+    }
+  };
+
+  const handleAddToCart = async (productId) => {
+    if (!user) {
+      console.log("Please login to add products to cart");
+      return;
+    }
+
+    try {
+      await addToCart(productId, 1);
+      console.log("Product added to cart");
+    } catch (error) {
+      console.log("Add to cart error:", error);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#fffaf4] font-sans text-[#2f211b]">
@@ -45,7 +97,11 @@ const Wishlist = () => {
         </div>
 
         {/* WISHLIST */}
-        {wishlistProducts.length > 0 ? (
+        {loading ? (
+          <div className="flex min-h-[380px] items-center justify-center">
+            <p className="text-sm text-[#817168]">Loading wishlist...</p>
+          </div>
+        ) : wishlistProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
               {wishlistProducts.map((product) => {
@@ -54,10 +110,10 @@ const Wishlist = () => {
                   product.price - (product.price * discount) / 100;
 
                 return (
-                  <article key={product.id} className="group">
+                  <article key={product._id} className="group">
                     {/* IMAGE */}
                     <div className="relative overflow-hidden rounded-[16px] bg-[#f1e8dd]">
-                      <Link to={`/products/${product.id}`}>
+                      <Link to={`/products/${product._id}`}>
                         <div className="h-[280px] overflow-hidden sm:h-[290px]">
                           <img
                             src={product.image}
@@ -77,6 +133,7 @@ const Wishlist = () => {
                       {/* REMOVE */}
                       <button
                         type="button"
+                        onClick={() => handleRemoveWishlist(product._id)}
                         className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-[#dfd3c7] bg-[#fffaf4]/90 text-[#8b7769] shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-[#3a1407] hover:text-white"
                         aria-label={`Remove ${product.name} from wishlist`}>
                         <Heart
@@ -90,7 +147,8 @@ const Wishlist = () => {
                       <div className="absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                         <button
                           type="button"
-                          className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#3a1407] text-[10px] font-semibold text-white shadow-lg shadow-[#3a1407]/15 transition-colors hover:bg-[#54200f]">
+                          className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#3a1407] text-[10px] font-semibold text-white shadow-lg shadow-[#3a1407]/15 transition-colors hover:bg-[#54200f]"
+                          onClick={() => handleAddToCart(product._id)}>
                           <ShoppingBag size={14} />
                           Add to Cart
                         </button>
@@ -98,7 +156,7 @@ const Wishlist = () => {
                     </div>
 
                     {/* DETAILS */}
-                    <Link to={`/products/${product.id}`}>
+                    <Link to={`/products/${product._id}`}>
                       <div className="px-1 pt-4">
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#a05f38]">
