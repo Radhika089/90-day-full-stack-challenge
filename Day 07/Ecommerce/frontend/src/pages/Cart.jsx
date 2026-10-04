@@ -8,14 +8,22 @@ import {
   X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useEffect } from "react";
 import { clearCart, getCart, removeFromCart, updateCart } from "../api/cartApi";
+import { AuthContext } from "../context/AuthContext";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    if (!user) {
+      console.log("Please login to continue");
+      setLoading(false);
+      return;
+    }
+
     const fetchCart = async () => {
       try {
         const data = await getCart();
@@ -25,7 +33,7 @@ const Cart = () => {
       }
     };
     fetchCart();
-  }, []);
+  }, [user]);
 
   const handleUpdateQuantity = async (productId, newQuantity) => {
     try {

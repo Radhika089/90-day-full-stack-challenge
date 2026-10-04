@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useContext } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,15 +11,109 @@ import {
   Trash2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getCart, removeFromCart, updateCart } from "../api/cartApi";
+import { AuthContext } from "../context/AuthContext";
 
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext);
 
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [country, setCountry] = useState("India");
 
-  useEffect(() => {});
+  const [formData, setFormData] = useState({
+    email: "",
+    phone: "",
+    firstName: "",
+    lastName: "",
+    address: "",
+    apartment: "",
+    city: "",
+    state: "",
+    zip: "",
+  });
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleContinue = () => {
+    const requiredFields = [
+      "email",
+      "phone",
+      "firstName",
+      "lastName",
+      "address",
+      "city",
+      "state",
+      "zip",
+    ];
+
+    const missingField = requiredFields.find(
+      (field) => !formData[field].trim(),
+    );
+
+    if (missingField) {
+      console.log("Please fill in all required fields");
+      return;
+    }
+
+    console.log("Checkout data:", {
+      ...formData,
+      country,
+      paymentMethod,
+      cartItems,
+      total,
+    });
+  };
+
+  useEffect(() => {
+    if (!user) {
+      console.log("Please login to continue");
+      setLoading(false);
+      return;
+    }
+
+    const fetchCart = async () => {
+      try {
+        const data = await getCart();
+
+        console.log("Checkout cart:", data);
+
+        setCartItems(data.cart.items);
+      } catch (error) {
+        console.error("Failed to fetch cart:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, [user]);
+
+  const handleUpdateQuantity = async (productId, newQuantity) => {
+    try {
+      const data = await updateCart(productId, newQuantity);
+      setCartItems(data.cart.items);
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
+    }
+  };
+
+  const handleRemoveItem = async (productId) => {
+    try {
+      const data = await removeFromCart(productId);
+      setCartItems(data.cart.items);
+    } catch (error) {
+      console.error("Failed to remove item from the cart:", error);
+    }
+  };
 
   const subtotal = useMemo(() => {
     return cartItems.reduce(
@@ -31,6 +125,16 @@ const Checkout = () => {
   const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 5;
   const discount = 0;
   const total = subtotal + shipping - discount;
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#fffaf4] font-sans text-[#2f211b]">
+        <div className="flex min-h-screen items-center justify-center">
+          <p className="text-xs text-[#8d8178]">Loading your cart...</p>
+        </div>
+      </main>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -142,6 +246,8 @@ const Checkout = () => {
                 <input
                   id="email"
                   type="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="you@example.com"
                   className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                 />
@@ -158,6 +264,8 @@ const Checkout = () => {
                 <input
                   id="phone"
                   type="tel"
+                  onChange={handleChange}
+                  value={formData.phone}
                   placeholder="+91 98765 43210"
                   className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                 />
@@ -178,6 +286,8 @@ const Checkout = () => {
                   <input
                     id="firstName"
                     type="text"
+                    onChange={handleChange}
+                    value={formData.firstName}
                     placeholder="First name"
                     className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                   />
@@ -193,6 +303,8 @@ const Checkout = () => {
                   <input
                     id="lastName"
                     type="text"
+                    value={formData.lastName}
+                    onChange={handleChange}
                     placeholder="Last name"
                     className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                   />
@@ -210,6 +322,8 @@ const Checkout = () => {
                 <input
                   id="address"
                   type="text"
+                  onChange={handleChange}
+                  value={formData.address}
                   placeholder="House number and street name"
                   className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                 />
@@ -227,6 +341,8 @@ const Checkout = () => {
                 <input
                   id="apartment"
                   type="text"
+                  onChange={handleChange}
+                  value={formData.apartment}
                   placeholder="Apartment, suite, etc."
                   className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                 />
@@ -244,6 +360,8 @@ const Checkout = () => {
                   <input
                     id="city"
                     type="text"
+                    onChange={handleChange}
+                    value={formData.city}
                     placeholder="City"
                     className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                   />
@@ -259,6 +377,8 @@ const Checkout = () => {
                   <input
                     id="state"
                     type="text"
+                    value={formData.state}
+                    onChange={handleChange}
                     placeholder="State"
                     className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                   />
@@ -274,6 +394,8 @@ const Checkout = () => {
                   <input
                     id="zip"
                     type="text"
+                    value={formData.zip}
+                    onChange={handleChange}
                     placeholder="Postal code"
                     className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                   />
@@ -438,7 +560,7 @@ const Checkout = () => {
               {/* ITEMS */}
               <div className="mt-6 space-y-5 border-b border-[#e8e0d8] pb-5">
                 {cartItems.map(({ product, quantity }) => (
-                  <div key={product.id} className="flex gap-3">
+                  <div key={product._id} className="flex gap-3">
                     {/* IMAGE */}
                     <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-[9px] bg-[#f1e8dd]">
                       <img
@@ -469,7 +591,12 @@ const Checkout = () => {
                         <div className="flex h-7 items-center overflow-hidden rounded-full border border-[#ded2c5] bg-[#faf6f0]">
                           <button
                             type="button"
-                            onClick={() => updateQuantity(product.id, -1)}
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                product._id,
+                                Math.max(1, quantity - 1),
+                              )
+                            }
                             className="flex h-7 w-7 items-center justify-center text-[#8d8178] transition-colors hover:text-[#3a1407]"
                             aria-label={`Decrease ${product.name} quantity`}>
                             <Minus size={11} />
@@ -481,7 +608,12 @@ const Checkout = () => {
 
                           <button
                             type="button"
-                            onClick={() => updateQuantity(product.id, 1)}
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                product._id,
+                                Math.max(1, quantity + 1),
+                              )
+                            }
                             className="flex h-7 w-7 items-center justify-center text-[#8d8178] transition-colors hover:text-[#3a1407]"
                             aria-label={`Increase ${product.name} quantity`}>
                             <Plus size={11} />
@@ -490,7 +622,7 @@ const Checkout = () => {
 
                         <button
                           type="button"
-                          onClick={() => removeItem(product.id)}
+                          onClick={() => handleRemoveItem(product._id)}
                           className="flex items-center gap-1 text-[9px] text-[#a0948b] transition-colors hover:text-[#a05f38]">
                           <Trash2 size={11} />
                           Remove
@@ -569,12 +701,13 @@ const Checkout = () => {
               </div>
 
               {/* PLACE ORDER */}
-              <Link
-                to="/order-success"
+              <button
+                type="button"
+                onClick={handleContinue}
                 className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#3a1407] text-[10px] font-semibold text-white transition-all duration-300 hover:bg-[#54200f]">
                 Continue to Payment
                 <ArrowRight size={14} />
-              </Link>
+              </button>
 
               {/* BACK TO CART */}
               <Link
