@@ -10,14 +10,20 @@ import {
   ShoppingBag,
   Trash2,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getCart, removeFromCart, updateCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
+import {
+  createOrder,
+  createRazorpayOrder,
+  verifyPayment,
+} from "../api/orderApi";
 
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [country, setCountry] = useState("India");
@@ -43,7 +49,7 @@ const Checkout = () => {
     }));
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const requiredFields = [
       "email",
       "phone",
@@ -63,6 +69,75 @@ const Checkout = () => {
       console.log("Please fill in all required fields");
       return;
     }
+
+    const shippingAddress = {
+      name: `${formData.firstName} ${formData.lastName}`,
+      phone: formData.phone,
+      email: formData.email,
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      pincode: formData.zip,
+    };
+
+    const data = await createOrder(shippingAddress, paymentMethod);
+
+    if (paymentMethod === "cod") {
+      console.log("COD order created", data);
+
+      navigate("/order-success", {
+        state: { order: data.order },
+      });
+
+      return;
+    }
+
+    console.log("AURA order created:", data);
+
+    const razorpayData = await createRazorpayOrder(data.order._id);
+
+    console.log("Razorpay order created:", razorpayData);
+    console.log("Razorpay Key:", import.meta.env.VITE_RAZORPAY_KEY_ID);
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: razorpayData.razorpayOrder.amount,
+      currency: razorpayData.razorpayOrder.currency,
+      name: "AURA Coffee Co.",
+      description: "AURA Coffee Order",
+      order_id: razorpayData.razorpayOrder.id,
+
+      prefill: {
+        name: shippingAddress.name,
+        email: shippingAddress.email,
+        contact: shippingAddress.phone,
+      },
+
+      handler: async (response) => {
+        try {
+          console.log("Razorpay payment response:", response);
+
+          const verificationData = await verifyPayment({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+
+          console.log("Payment verification:", verificationData);
+
+          if (verificationData.success) {
+            navigate("/order-success", {
+              state: { order: verificationData.order },
+            });
+          }
+        } catch (error) {
+          console.error("Payment verification failed:", error);
+        }
+      },
+    };
+
+    const razorpay = new window.Razorpay(options);
+
+    razorpay.open();
 
     console.log("Checkout data:", {
       ...formData,
@@ -122,7 +197,7 @@ const Checkout = () => {
     );
   }, [cartItems]);
 
-  const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 5;
+  const shipping = subtotal >= 500 || subtotal === 0 ? 0 : 49;
   const discount = 0;
   const total = subtotal + shipping - discount;
 
@@ -705,7 +780,9 @@ const Checkout = () => {
                 type="button"
                 onClick={handleContinue}
                 className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#3a1407] text-[10px] font-semibold text-white transition-all duration-300 hover:bg-[#54200f]">
-                Continue to Payment
+                {paymentMethod === "cod"
+                  ? "Place Order"
+                  : "Continue to Payment"}
                 <ArrowRight size={14} />
               </button>
 

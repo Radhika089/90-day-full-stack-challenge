@@ -5,7 +5,14 @@ import crypto from "crypto";
 import razorpay from "../config/razorpay.js";
 
 export async function createOrder(req, res) {
-  const { shippingAddress } = req.body;
+  const { shippingAddress, paymentMethod } = req.body;
+
+  if (!["cod", "razorpay"].includes(paymentMethod)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid payment method",
+    });
+  }
 
   try {
     const cart = await cartModel.findOne({ user: req.user._id });
@@ -26,7 +33,6 @@ export async function createOrder(req, res) {
 
     let subtotal = 0;
     let discount = 0;
-    let shippingFee = 5;
     let orderItems = [];
 
     for (const item of cart.items) {
@@ -55,6 +61,8 @@ export async function createOrder(req, res) {
       });
     }
 
+    let shippingFee = subtotal >= 500 ? 0 : 49;
+
     let totalAmount = subtotal + shippingFee - discount;
 
     const order = await orderModel.create({
@@ -65,8 +73,32 @@ export async function createOrder(req, res) {
       totalAmount,
       subtotal,
       discount,
+      paymentMethod,
     });
 
+    if (paymentMethod === "cod") {
+      for (const item of order.items) {
+        const product = await productModel.findById(item.product);
+
+        if (!product) {
+          return res.status(404).json({
+            success: false,
+            message: "Product not found",
+          });
+        }
+
+        product.stock -= item.quantity;
+        await product.save();
+      }
+
+      order.orderStatus = "processing";
+      await order.save();
+
+      await cartModel.findOneAndUpdate(
+        { user: req.user._id },
+        { $set: { items: [] } },
+      );
+    }
     return res.status(201).json({
       success: true,
       message: "Order created successfully",
@@ -364,6 +396,9 @@ export async function verifyPayment(req, res) {
       { user: req.user._id },
       { $set: { items: [] } },
     );
+
+    // Populate product details for OrderSuccess page
+    await order.populate("items.product");
 
     return res.status(200).json({
       success: true,

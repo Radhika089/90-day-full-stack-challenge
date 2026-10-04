@@ -20,7 +20,6 @@ const Cart = () => {
   useEffect(() => {
     if (!user) {
       console.log("Please login to continue");
-      setLoading(false);
       return;
     }
 

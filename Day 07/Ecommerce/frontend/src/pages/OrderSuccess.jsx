@@ -1,27 +1,14 @@
-import React from "react";
 import { ArrowRight, Check, Coffee, Package, Truck } from "lucide-react";
-import { Link } from "react-router-dom";
-import products from "../utils/constant";
+import { Link, useLocation } from "react-router-dom";
 
 const OrderSuccess = () => {
-  const orderItems = [
-    {
-      product: products[0],
-      quantity: 1,
-    },
-    {
-      product: products[1],
-      quantity: 1,
-    },
-  ];
+  const location = useLocation();
+  const order = location.state?.order;
 
-  const subtotal = orderItems.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0,
-  );
-
-  const shipping = subtotal >= 50 ? 0 : 5;
-  const total = subtotal + shipping;
+  const orderItems = order?.items || [];
+  const subtotal = order?.subtotal || 0;
+  const shipping = order?.shippingFee || 0;
+  const total = order?.totalAmount || 0;
 
   return (
     <main className="min-h-screen bg-[#fffaf4] font-sans text-[#3a1407]">
@@ -71,7 +58,7 @@ const OrderSuccess = () => {
                   </p>
 
                   <p className="mt-1 text-[10px] text-[#c8a993]">
-                    Order #AURA-1042
+                    Order #{order?._id?.slice(-6).toUpperCase()}
                   </p>
                 </div>
               </div>
@@ -111,7 +98,9 @@ const OrderSuccess = () => {
                 <div className="flex items-center justify-between text-[10px]">
                   <span className="text-[#bfa594]">Order status</span>
 
-                  <span className="font-medium text-[#dca875]">Confirmed</span>
+                  <span className="font-medium capitalize text-[#dca875]">
+                    {order?.orderStatus || "Confirmed"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -144,12 +133,12 @@ const OrderSuccess = () => {
 
               {/* Items */}
               <div className="divide-y divide-[#e8e0d8]">
-                {orderItems.map(({ product, quantity }) => (
+                {orderItems.map(({ product, quantity, price }) => (
                   <div
-                    key={product.id}
+                    key={product._id}
                     className="flex gap-4 px-5 py-5 sm:px-6">
                     <Link
-                      to={`/products/${product.id}`}
+                      to={`/products/${product._id}`}
                       className="h-20 w-20 shrink-0 overflow-hidden rounded-[10px] bg-[#f1e8dd]">
                       <img
                         src={product.image}
@@ -180,7 +169,7 @@ const OrderSuccess = () => {
 
                     <div className="text-right">
                       <p className="text-sm font-semibold text-[#3a1407]">
-                        ₹{(product.price * quantity).toFixed(0)}
+                        ₹{(price * quantity).toFixed(0)}
                       </p>
                     </div>
                   </div>
@@ -232,7 +221,9 @@ const OrderSuccess = () => {
                 </p>
 
                 <p className="mt-1 text-[10px] text-[#817168]">
-                  Payment received securely
+                  {order?.paymentMethod === "cod"
+                    ? "Payment due on delivery"
+                    : "Payment received securely"}
                 </p>
               </div>
             </aside>
