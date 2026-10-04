@@ -9,7 +9,7 @@ import {
   ShoppingBag,
   Star,
 } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getProducts, getSingleProduct } from "../api/productApi";
 import { addToCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
@@ -23,6 +23,7 @@ import Product from "../components/Product";
 const ProductDetails = () => {
   const { user } = useContext(AuthContext);
   const { productId } = useParams();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [products, setProducts] = useState([]);
@@ -73,6 +74,19 @@ const ProductDetails = () => {
       console.log(data);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!user) {
+      console.log("Please login to buy this product");
+      return;
+    }
+    try {
+      await addToCart(product._id, quantity);
+      navigate("/checkout");
+    } catch (error) {
+      console.error("Failed to buy product:", error);
     }
   };
 
@@ -289,7 +303,9 @@ const ProductDetails = () => {
                   Add to cart
                 </button>
 
-                <button className="h-12 rounded-[6px] bg-[#3a1407] text-sm font-semibold text-white transition hover:bg-[#54200f]">
+                <button
+                  className="h-12 rounded-[6px] bg-[#3a1407] text-sm font-semibold text-white transition hover:bg-[#54200f]"
+                  onClick={handleBuyNow}>
                   Buy now
                 </button>
               </div>

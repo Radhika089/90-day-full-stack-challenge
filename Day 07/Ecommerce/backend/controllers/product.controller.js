@@ -66,7 +66,25 @@ export async function createProduct(req, res) {
 
 export async function getAllProducts(req, res) {
   try {
-    const products = await productModel.find({ isActive: true });
+    const { search } = req.query;
+
+    let query = { isActive: true };
+
+    if (search) {
+      query.$or = [
+        {
+          name: { $regex: search, $options: "i" },
+        },
+        {
+          category: { $regex: search, $options: "i" },
+        },
+        {
+          brand: { $regex: search, $options: "i" },
+        },
+      ];
+    }
+
+    const products = await productModel.find(query);
     res.status(200).json({
       success: true,
       count: products.length,

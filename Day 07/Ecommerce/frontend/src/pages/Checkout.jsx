@@ -1,40 +1,70 @@
-import React from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  CreditCard,
+  Check,
+  ChevronDown,
   Lock,
+  Minus,
+  Plus,
   ShoppingBag,
+  Trash2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import products from "../utils/constant";
 
 const Checkout = () => {
-  // Temporary checkout data.
-  // Replace this with your backend cart data later.
-  const cartItems = [
-    {
-      product: products[0],
-      quantity: 1,
-    },
-    {
-      product: products[1],
-      quantity: 1,
-    },
-    {
-      product: products[2],
-      quantity: 1,
-    },
-  ];
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0,
-  );
+  const [paymentMethod, setPaymentMethod] = useState("razorpay");
+  const [country, setCountry] = useState("India");
 
-  const shipping = subtotal >= 50 ? 0 : 5;
+  useEffect(() => {});
+
+  const subtotal = useMemo(() => {
+    return cartItems.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0,
+    );
+  }, [cartItems]);
+
+  const shipping = subtotal >= 50 || subtotal === 0 ? 0 : 5;
   const discount = 0;
   const total = subtotal + shipping - discount;
+
+  if (cartItems.length === 0) {
+    return (
+      <main className="min-h-screen bg-[#fffaf4] font-sans text-[#2f211b]">
+        <div className="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-5">
+          <div className="w-full rounded-[22px] border border-[#e3d9ce] bg-[#fffdf9] px-6 py-14 text-center sm:px-10">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f1e8dd]">
+              <ShoppingBag size={22} className="text-[#a05f38]" />
+            </div>
+
+            <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#a05f38]">
+              Your cart is empty
+            </p>
+
+            <h1 className="mt-2 text-3xl font-medium tracking-[-0.04em] text-[#3a1407]">
+              Nothing to checkout yet.
+            </h1>
+
+            <p className="mx-auto mt-3 max-w-md text-xs leading-5 text-[#817168]">
+              Add something from the AURA collection and come back when you're
+              ready to place your order.
+            </p>
+
+            <Link
+              to="/shop"
+              className="mx-auto mt-7 flex h-11 w-fit items-center gap-2 rounded-full bg-[#3a1407] px-6 text-[10px] font-semibold text-white transition-colors hover:bg-[#54200f]">
+              Continue Shopping
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#fffaf4] font-sans text-[#2f211b]">
@@ -68,7 +98,7 @@ const Checkout = () => {
             </h1>
 
             <p className="mt-2 text-xs leading-5 text-[#817168] sm:text-sm">
-              Complete your details and place your coffee order.
+              Confirm your order and delivery details.
             </p>
           </div>
 
@@ -82,16 +112,17 @@ const Checkout = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_350px] lg:items-start">
           {/* LEFT */}
           <div className="space-y-6">
-            {/* CONTACT + SHIPPING */}
+            {/* CONTACT + DELIVERY */}
             <section className="rounded-[18px] border border-[#e3d9ce] bg-[#fffdf9] p-5 sm:p-6">
-              <div className="mb-6 flex items-start gap-4">
+              {/* SECTION HEADER */}
+              <div className="mb-7 flex items-start gap-4">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1e8dd] text-[10px] font-semibold text-[#a05f38]">
                   01
                 </div>
 
                 <div>
                   <h2 className="text-lg font-semibold text-[#3a1407]">
-                    Contact & Shipping
+                    Contact & Delivery
                   </h2>
 
                   <p className="mt-1 text-xs text-[#817168]">
@@ -116,8 +147,27 @@ const Checkout = () => {
                 />
               </div>
 
+              {/* PHONE */}
+              <div className="mt-5">
+                <label
+                  htmlFor="phone"
+                  className="mb-2 block text-[11px] font-medium text-[#5d4b3e]">
+                  Phone Number
+                </label>
+
+                <input
+                  id="phone"
+                  type="tel"
+                  placeholder="+91 98765 43210"
+                  className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
+                />
+              </div>
+
+              {/* DIVIDER */}
+              <div className="my-7 border-t border-[#e8e0d8]" />
+
               {/* NAME */}
-              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <label
                     htmlFor="firstName"
@@ -182,7 +232,7 @@ const Checkout = () => {
                 />
               </div>
 
-              {/* CITY STATE ZIP */}
+              {/* CITY STATE PINCODE */}
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <div>
                   <label
@@ -218,7 +268,7 @@ const Checkout = () => {
                   <label
                     htmlFor="zip"
                     className="mb-2 block text-[11px] font-medium text-[#5d4b3e]">
-                    ZIP / Postal Code
+                    PIN Code
                   </label>
 
                   <input
@@ -238,155 +288,167 @@ const Checkout = () => {
                   Country
                 </label>
 
-                <select
-                  id="country"
-                  defaultValue="India"
-                  className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors focus:border-[#a05f38]">
-                  <option>India</option>
-                  <option>United States</option>
-                  <option>United Kingdom</option>
-                  <option>Canada</option>
-                  <option>Australia</option>
-                </select>
+                <div className="relative">
+                  <select
+                    id="country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="h-11 w-full appearance-none rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 pr-10 text-xs text-[#3a1407] outline-none transition-colors focus:border-[#a05f38]">
+                    <option>India</option>
+                    <option>United States</option>
+                    <option>United Kingdom</option>
+                    <option>Canada</option>
+                    <option>Australia</option>
+                  </select>
+
+                  <ChevronDown
+                    size={14}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#a0948b]"
+                  />
+                </div>
               </div>
             </section>
 
             {/* PAYMENT */}
             <section className="rounded-[18px] border border-[#e3d9ce] bg-[#fffdf9] p-5 sm:p-6">
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1e8dd] text-[10px] font-semibold text-[#a05f38]">
-                    02
-                  </div>
+              {/* SECTION HEADER */}
+              <div className="mb-7 flex items-start gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1e8dd] text-[10px] font-semibold text-[#a05f38]">
+                  02
+                </div>
 
-                  <div>
-                    <h2 className="text-lg font-semibold text-[#3a1407]">
-                      Payment
-                    </h2>
+                <div>
+                  <h2 className="text-lg font-semibold text-[#3a1407]">
+                    Payment
+                  </h2>
 
-                    <p className="mt-1 text-xs text-[#817168]">
-                      Enter your payment details securely.
+                  <p className="mt-1 text-xs text-[#817168]">
+                    Choose how you'd like to pay.
+                  </p>
+                </div>
+              </div>
+
+              {/* RAZORPAY */}
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("razorpay")}
+                className={`flex w-full items-center gap-4 rounded-[10px] border p-4 text-left transition-colors ${
+                  paymentMethod === "razorpay"
+                    ? "border-[#a05f38] bg-[#fff8ef]"
+                    : "border-[#ded2c5] bg-[#faf6f0] hover:border-[#c8b8aa]"
+                }`}>
+                <div
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                    paymentMethod === "razorpay"
+                      ? "border-[#a05f38]"
+                      : "border-[#b9aca2]"
+                  }`}>
+                  {paymentMethod === "razorpay" && (
+                    <div className="h-2.5 w-2.5 rounded-full bg-[#a05f38]" />
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs font-semibold text-[#3a1407]">
+                      Razorpay
                     </p>
+
+                    <span className="rounded-full bg-[#f1e8dd] px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.12em] text-[#a05f38]">
+                      Secure
+                    </span>
                   </div>
+
+                  <p className="mt-1 text-[10px] leading-4 text-[#8d8178]">
+                    UPI, cards, net banking and wallets
+                  </p>
+                </div>
+              </button>
+
+              {/* CASH ON DELIVERY */}
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("cod")}
+                className={`mt-3 flex w-full items-center gap-4 rounded-[10px] border p-4 text-left transition-colors ${
+                  paymentMethod === "cod"
+                    ? "border-[#a05f38] bg-[#fff8ef]"
+                    : "border-[#ded2c5] bg-[#faf6f0] hover:border-[#c8b8aa]"
+                }`}>
+                <div
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                    paymentMethod === "cod"
+                      ? "border-[#a05f38]"
+                      : "border-[#b9aca2]"
+                  }`}>
+                  {paymentMethod === "cod" && (
+                    <div className="h-2.5 w-2.5 rounded-full bg-[#a05f38]" />
+                  )}
                 </div>
 
-                <CreditCard
-                  size={18}
-                  strokeWidth={1.7}
-                  className="text-[#a05f38]"
-                />
-              </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs font-semibold text-[#3a1407]">
+                      Cash on Delivery
+                    </p>
 
-              {/* CARD NUMBER */}
-              <div>
-                <label
-                  htmlFor="cardNumber"
-                  className="mb-2 block text-[11px] font-medium text-[#5d4b3e]">
-                  Card Number
-                </label>
+                    <span className="rounded-full bg-[#f1e8dd] px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.12em] text-[#8d8178]">
+                      COD
+                    </span>
+                  </div>
 
-                <div className="relative">
-                  <input
-                    id="cardNumber"
-                    type="text"
-                    placeholder="1234 5678 9012 3456"
-                    className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 pr-10 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
-                  />
-
-                  <CreditCard
-                    size={15}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0948b]"
-                  />
+                  <p className="mt-1 text-[10px] leading-4 text-[#8d8178]">
+                    Pay when your order arrives
+                  </p>
                 </div>
-              </div>
+              </button>
 
-              {/* EXPIRY + CVV */}
-              <div className="mt-5 grid grid-cols-2 gap-5">
-                <div>
-                  <label
-                    htmlFor="expiry"
-                    className="mb-2 block text-[11px] font-medium text-[#5d4b3e]">
-                    Expiry Date
-                  </label>
-
-                  <input
-                    id="expiry"
-                    type="text"
-                    placeholder="MM / YY"
-                    className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="cvv"
-                    className="mb-2 block text-[11px] font-medium text-[#5d4b3e]">
-                    CVV
-                  </label>
-
-                  <input
-                    id="cvv"
-                    type="text"
-                    placeholder="123"
-                    className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
-                  />
-                </div>
-              </div>
-
-              {/* NAME */}
-              <div className="mt-5">
-                <label
-                  htmlFor="cardName"
-                  className="mb-2 block text-[11px] font-medium text-[#5d4b3e]">
-                  Name on Card
-                </label>
-
-                <input
-                  id="cardName"
-                  type="text"
-                  placeholder="Full name"
-                  className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
-                />
-              </div>
-
-              {/* SECURITY */}
+              {/* PAYMENT NOTE */}
               <div className="mt-5 flex items-start gap-2 border-t border-[#e8e0d8] pt-5">
                 <Lock size={13} className="mt-0.5 shrink-0 text-[#a05f38]" />
 
                 <p className="text-[10px] leading-5 text-[#a0948b]">
-                  Your payment information is encrypted and securely processed.
+                  {paymentMethod === "razorpay"
+                    ? "You'll be securely redirected to Razorpay to complete your payment. AURA never stores your card details."
+                    : "Pay in cash when your AURA order is delivered to your address."}
                 </p>
               </div>
             </section>
           </div>
 
-          {/* ORDER SUMMARY */}
+          {/* RIGHT — ORDER SUMMARY */}
           <aside className="lg:sticky lg:top-24">
             <div className="rounded-[18px] border border-[#e3d9ce] bg-[#fffdf9] p-5 sm:p-6">
-              <div className="flex items-center gap-2">
-                <ShoppingBag size={16} className="text-[#a05f38]" />
+              {/* SUMMARY HEADER */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <ShoppingBag size={16} className="text-[#a05f38]" />
 
-                <h2 className="text-base font-semibold text-[#3a1407]">
-                  Order Summary
-                </h2>
+                  <h2 className="text-base font-semibold text-[#3a1407]">
+                    Order Summary
+                  </h2>
+                </div>
+
+                <Link
+                  to="/cart"
+                  className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[#a05f38] transition-colors hover:text-[#3a1407]">
+                  Edit Cart
+                </Link>
               </div>
 
               {/* ITEMS */}
-              <div className="mt-6 space-y-4 border-b border-[#e8e0d8] pb-5">
+              <div className="mt-6 space-y-5 border-b border-[#e8e0d8] pb-5">
                 {cartItems.map(({ product, quantity }) => (
                   <div key={product.id} className="flex gap-3">
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[8px] bg-[#f1e8dd]">
+                    {/* IMAGE */}
+                    <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-[9px] bg-[#f1e8dd]">
                       <img
                         src={product.image}
                         alt={product.name}
                         className="h-full w-full object-cover"
                       />
-
-                      <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#3a1407] text-[8px] text-white">
-                        {quantity}
-                      </span>
                     </div>
 
+                    {/* INFO */}
                     <div className="min-w-0 flex-1">
                       <p className="text-[8px] font-semibold uppercase tracking-[0.16em] text-[#a05f38]">
                         {product.category}
@@ -401,9 +463,43 @@ const Checkout = () => {
                           ? `${product.roast} Roast`
                           : "Coffee Essential"}
                       </p>
+
+                      {/* QUANTITY CONTROLS */}
+                      <div className="mt-2 flex items-center justify-between gap-2">
+                        <div className="flex h-7 items-center overflow-hidden rounded-full border border-[#ded2c5] bg-[#faf6f0]">
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(product.id, -1)}
+                            className="flex h-7 w-7 items-center justify-center text-[#8d8178] transition-colors hover:text-[#3a1407]"
+                            aria-label={`Decrease ${product.name} quantity`}>
+                            <Minus size={11} />
+                          </button>
+
+                          <span className="w-5 text-center text-[9px] font-semibold text-[#3a1407]">
+                            {quantity}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(product.id, 1)}
+                            className="flex h-7 w-7 items-center justify-center text-[#8d8178] transition-colors hover:text-[#3a1407]"
+                            aria-label={`Increase ${product.name} quantity`}>
+                            <Plus size={11} />
+                          </button>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => removeItem(product.id)}
+                          className="flex items-center gap-1 text-[9px] text-[#a0948b] transition-colors hover:text-[#a05f38]">
+                          <Trash2 size={11} />
+                          Remove
+                        </button>
+                      </div>
                     </div>
 
-                    <span className="text-xs font-semibold text-[#3a1407]">
+                    {/* PRICE */}
+                    <span className="shrink-0 text-xs font-semibold text-[#3a1407]">
                       ₹{(product.price * quantity).toFixed(0)}
                     </span>
                   </div>
@@ -476,13 +572,31 @@ const Checkout = () => {
               <Link
                 to="/order-success"
                 className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#3a1407] text-[10px] font-semibold text-white transition-all duration-300 hover:bg-[#54200f]">
-                Place Order
+                Continue to Payment
                 <ArrowRight size={14} />
               </Link>
 
-              <p className="mt-3 text-center text-[9px] leading-4 text-[#a0948b]">
-                By placing your order, you agree to our terms and conditions.
+              {/* BACK TO CART */}
+              <Link
+                to="/cart"
+                className="mt-3 flex items-center justify-center gap-1 text-[9px] text-[#8d8178] transition-colors hover:text-[#3a1407]">
+                <ArrowLeft size={11} />
+                Back to cart
+              </Link>
+
+              {/* TERMS */}
+              <p className="mt-4 text-center text-[9px] leading-4 text-[#a0948b]">
+                By continuing, you agree to our terms and conditions.
               </p>
+
+              {/* SECURE NOTE */}
+              <div className="mt-5 flex items-center justify-center gap-2 border-t border-[#e8e0d8] pt-5">
+                <Check size={12} className="text-[#a05f38]" />
+
+                <span className="text-[9px] text-[#8d8178]">
+                  Secure checkout · Your information is protected
+                </span>
+              </div>
             </div>
           </aside>
         </div>

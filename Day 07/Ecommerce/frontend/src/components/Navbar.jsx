@@ -20,10 +20,21 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState(null);
   const [wishlist, setWishlist] = useState(null);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -81,6 +92,21 @@ const Navbar = () => {
     navigate("/");
   };
 
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setIsSearching(true);
+  };
+
+  useEffect(() => {
+    if (!isSearching) return;
+
+    if (debouncedSearch.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(debouncedSearch.trim())}`);
+    } else {
+      navigate("/shop");
+    }
+  }, [debouncedSearch, navigate, isSearching]);
+
   const subtotal =
     cart?.items.reduce(
       (total, item) => total + item.product.price * item.quantity,
@@ -136,6 +162,8 @@ const Navbar = () => {
                 <input
                   type="text"
                   autoFocus
+                  value={search}
+                  onChange={handleSearch}
                   placeholder="Search coffee..."
                   className="mr-2 w-40 rounded-full border border-[#e5d7c7] bg-white px-4 py-2 text-sm outline-none focus:border-[#b96447]"
                 />

@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   SlidersHorizontal,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Product from "../components/Product";
 import { getProducts } from "../api/productApi";
 
@@ -15,6 +15,8 @@ const CollectionPage = ({
   category = "all",
   bannerImage = "/hero2.jpg",
 }) => {
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search") || "";
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedRoast, setSelectedRoast] = useState("all");
   const [sortBy, setSortBy] = useState("Featured");
@@ -101,14 +103,14 @@ const CollectionPage = ({
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const data = await getProducts();
+      const data = await getProducts(search);
 
       console.log("API DATA:", data);
 
       setProducts(data.products);
     };
     fetchProducts();
-  }, []);
+  }, [search]);
 
   return (
     <main className="min-h-screen bg-[#fffaf2] font-sans text-[#3a1407]">
