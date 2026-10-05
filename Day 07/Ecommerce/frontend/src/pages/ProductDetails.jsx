@@ -19,6 +19,7 @@ import {
   removeFromWishlist,
 } from "../api/wishlistApi";
 import Product from "../components/Product";
+import toast from "react-hot-toast";
 
 const ProductDetails = () => {
   const { user } = useContext(AuthContext);
@@ -34,11 +35,16 @@ const ProductDetails = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const data = await getSingleProduct(productId);
-      setProduct(data.product);
+      try {
+        const data = await getSingleProduct(productId);
+        setProduct(data.product);
 
-      const allProducts = await getProducts();
-      setProducts(allProducts.products);
+        const allProducts = await getProducts();
+        setProducts(allProducts.products);
+      } catch (error) {
+        console.log("Product error:", error);
+        toast.error(error.response?.data?.message || "Failed to load product");
+      }
     };
 
     const checkWishlist = async () => {
@@ -55,7 +61,10 @@ const ProductDetails = () => {
         );
 
         setIsWishListed(exists);
-      } catch (error) {}
+      } catch (error) {
+        console.log("Wishlist error:", error);
+        toast.error("Failed to load wishlist");
+      }
     };
 
     fetchProduct();
@@ -64,35 +73,42 @@ const ProductDetails = () => {
 
   const handleAddToCart = async () => {
     if (!user) {
-      console.log("Please login to add products to cart");
+      toast.error("Please login to add products to cart");
       return;
     }
 
     try {
-      const data = await addToCart(product._id, quantity);
+      await addToCart(product._id, quantity);
 
-      console.log(data);
+      toast.success("Product added to cart");
     } catch (error) {
       console.error("Failed to add product to cart:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to add product to cart",
+      );
     }
   };
 
   const handleBuyNow = async () => {
     if (!user) {
-      console.log("Please login to buy this product");
+      toast.error("Please login to buy this product");
       return;
     }
+
     try {
       await addToCart(product._id, quantity);
       navigate("/checkout");
     } catch (error) {
       console.error("Failed to buy product:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to add product to cart",
+      );
     }
   };
 
   const handleAddToWishlisList = async () => {
     if (!user) {
-      console.log("Please login to add products in wishlist");
+      toast.error("Please login to add products to wishlist");
       return;
     }
 
@@ -100,13 +116,17 @@ const ProductDetails = () => {
       if (isWishListed) {
         await removeFromWishlist(productId);
         setIsWishListed(false);
-        return;
-      } else {
-        await addToWishlist(productId);
-        setIsWishListed(true);
+        toast.success("Removed from wishlist");
         return;
       }
-    } catch (error) {}
+
+      await addToWishlist(productId);
+      setIsWishListed(true);
+      toast.success("Added to wishlist");
+    } catch (error) {
+      console.log("Wishlist error:", error);
+      toast.error(error.response?.data?.message || "Failed to update wishlist");
+    }
   };
 
   const relatedProducts = product

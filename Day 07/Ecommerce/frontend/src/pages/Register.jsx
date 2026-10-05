@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../api/authApi";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -27,12 +28,12 @@ const Register = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      console.log("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     if (!agreeTerms) {
-      console.log("Please accept the terms");
+      toast.error("Please accept the terms");
       return;
     }
 
@@ -43,16 +44,14 @@ const Register = () => {
         password: formData.password,
       });
 
-      console.log(data);
-
       if (data.success) {
+        toast.success("Account created successfully!");
         navigate("/login");
       }
     } catch (error) {
       console.log(error);
+      toast.error(error.response?.data?.message || "Registration failed");
     }
-
-    console.log("Registration submitted");
   };
 
   return (

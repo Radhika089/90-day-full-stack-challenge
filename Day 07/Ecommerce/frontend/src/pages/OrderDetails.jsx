@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getOrderById, cancelOrder } from "../api/orderApi";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const OrderDetails = () => {
   const { orderId } = useParams();
@@ -25,13 +27,16 @@ const OrderDetails = () => {
         const data = await getOrderById(orderId);
 
         if (data.success) {
-          navigate("/orders");
+          setOrder(data.order);
         } else {
           setError(data.message || "Order not found");
         }
       } catch (error) {
         console.error("Get order error:", error);
         setError("Unable to load order details");
+        toast.error(
+          error.response?.data?.message || "Failed to load order details",
+        );
       } finally {
         setLoading(false);
       }
@@ -49,11 +54,18 @@ const OrderDetails = () => {
   };
 
   const handleCancelOrder = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this order?",
-    );
+    const result = await Swal.fire({
+      title: "Cancel this order?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, cancel order",
+      cancelButtonText: "Keep order",
+      confirmButtonColor: "#8a3d32",
+      cancelButtonColor: "#795548",
+    });
 
-    if (!confirmed) return;
+    if (!result.isConfirmed) return;
 
     try {
       setCancelling(true);
@@ -62,13 +74,14 @@ const OrderDetails = () => {
 
       if (data.success) {
         setOrder(data.order);
+        toast.success("Order cancelled successfully");
       } else {
-        window.alert(data.message || "Failed to cancel order");
+        toast.error(data.message || "Failed to cancel order");
       }
     } catch (error) {
       console.error("Cancel order error:", error);
 
-      window.alert(error.response?.data?.message || "Failed to cancel order");
+      toast.error(error.response?.data?.message || "Failed to cancel order");
     } finally {
       setCancelling(false);
     }

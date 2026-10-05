@@ -8,6 +8,7 @@ import {
 import { Link, useSearchParams } from "react-router-dom";
 import Product from "../components/Product";
 import { getProducts } from "../api/productApi";
+import toast from "react-hot-toast";
 
 const CollectionPage = ({
   title = "Shop Our Coffee",
@@ -103,11 +104,13 @@ const CollectionPage = ({
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const data = await getProducts(search);
-
-      console.log("API DATA:", data);
-
-      setProducts(data.products);
+      try {
+        const data = await getProducts(search);
+        setProducts(data.products);
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to load products");
+      }
     };
     fetchProducts();
   }, [search]);

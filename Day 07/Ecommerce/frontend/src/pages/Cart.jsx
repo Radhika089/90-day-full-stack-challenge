@@ -12,6 +12,8 @@ import { useState, useContext } from "react";
 import { useEffect } from "react";
 import { clearCart, getCart, removeFromCart, updateCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -19,7 +21,7 @@ const Cart = () => {
 
   useEffect(() => {
     if (!user) {
-      console.log("Please login to continue");
+      toast.error("Please login to continue");
       return;
     }
 
@@ -29,6 +31,10 @@ const Cart = () => {
         setCart(data.cart);
       } catch (error) {
         console.error("Failed to fetch cart:", error);
+
+        toast.error(
+          error.response?.data?.message || "Failed to load your cart",
+        );
       }
     };
     fetchCart();
@@ -40,24 +46,54 @@ const Cart = () => {
       setCart(data.cart);
     } catch (error) {
       console.error("Failed to update cart:", error);
+
+      toast.error(error.response?.data?.message || "Failed to update cart");
     }
   };
 
   const handleRemoveItem = async (productId) => {
     try {
       const data = await removeFromCart(productId);
+      toast.success("Item removed from cart");
+
       setCart(data.cart);
     } catch (error) {
       console.error("Failed to remove item from the cart:", error);
+
+      toast.error(
+        error.response?.data?.message || "Failed to remove item from the cart",
+      );
     }
   };
 
   const handleClearCart = async () => {
+    if (!cart?.items?.length) {
+      toast.error("Your cart is already empty");
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Remove all items?",
+      text: "This will clear your entire cart.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove all",
+      cancelButtonText: "Keep items",
+      confirmButtonColor: "#8a3d32",
+      cancelButtonColor: "#795548",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const data = await clearCart();
       setCart(data.cart);
+
+      toast.success("Cart cleared successfully");
     } catch (error) {
       console.error("Failed to clear cart:", error);
+
+      toast.error(error.response?.data?.message || "Failed to clear your cart");
     }
   };
 
@@ -169,16 +205,14 @@ const Cart = () => {
                         <button
                           type="button"
                           className="flex h-full w-8 items-center justify-center rounded-l-full text-[#625247] transition hover:bg-[#f2e9de]"
-                          aria-label="Decrease quantity">
-                          <Minus
-                            size={11}
-                            onClick={() =>
-                              handleUpdateQuantity(
-                                product._id,
-                                Math.max(1, quantity - 1),
-                              )
-                            }
-                          />
+                          aria-label="Decrease quantity"
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              product._id,
+                              Math.max(1, quantity - 1),
+                            )
+                          }>
+                          <Minus size={11} />
                         </button>
 
                         <span className="flex h-full w-8 items-center justify-center border-x border-[#ded2c5] text-[11px] font-medium text-[#3a1407]">
@@ -188,16 +222,14 @@ const Cart = () => {
                         <button
                           type="button"
                           className="flex h-full w-8 items-center justify-center rounded-r-full text-[#625247] transition hover:bg-[#f2e9de]"
-                          aria-label="Increase quantity">
-                          <Plus
-                            size={11}
-                            onClick={() =>
-                              handleUpdateQuantity(
-                                product._id,
-                                Math.max(1, quantity + 1),
-                              )
-                            }
-                          />
+                          aria-label="Increase quantity"
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              product._id,
+                              Math.max(1, quantity + 1),
+                            )
+                          }>
+                          <Plus size={11} />
                         </button>
                       </div>
                     </div>
@@ -213,11 +245,9 @@ const Cart = () => {
                     <button
                       type="button"
                       className="absolute right-0 top-4 flex h-7 w-7 items-center justify-center rounded-full text-[#a29286] transition hover:bg-[#f5e8dc] hover:text-[#a64f32] sm:static"
-                      aria-label={`Remove ${product.name}`}>
-                      <X
-                        size={14}
-                        onClick={() => handleRemoveItem(product._id)}
-                      />
+                      aria-label={`Remove ${product.name}`}
+                      onClick={() => handleRemoveItem(product._id)}>
+                      <X size={14} />
                     </button>
                   </article>
                 );

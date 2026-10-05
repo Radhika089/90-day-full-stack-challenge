@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Coffee, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getMyOrders } from "../api/orderApi";
+import toast from "react-hot-toast";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -17,10 +18,15 @@ const MyOrders = () => {
           setOrders(data.orders || []);
         } else {
           setError(data.message || "Failed to load orders");
+          toast.error(data.message || "Failed to load orders");
         }
       } catch (error) {
         console.error("Get orders error:", error);
         setError("Unable to load your orders");
+
+        toast.error(
+          error.response?.data?.message || "Failed to load your orders",
+        );
       } finally {
         setLoading(false);
       }

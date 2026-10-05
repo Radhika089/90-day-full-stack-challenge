@@ -8,7 +8,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { getCurrentUser, loginUser } from "../api/authApi";
+import { loginUser } from "../api/authApi";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -28,19 +29,15 @@ const Login = () => {
         email: formData.email,
         password: formData.password,
       });
-      console.log(data);
 
       if (data.success) {
-        const currentUser = await getCurrentUser();
-        console.log("CURRENT USER:", currentUser);
-
+        toast.success("Welcome Back!");
         navigate("/");
       }
     } catch (error) {
       console.log(error);
+      toast.error(error.response?.data?.message || "Login failed");
     }
-
-    console.log("Login submitted");
   };
 
   return (

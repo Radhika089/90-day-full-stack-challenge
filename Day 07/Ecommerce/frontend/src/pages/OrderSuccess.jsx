@@ -10,6 +10,33 @@ const OrderSuccess = () => {
   const shipping = order?.shippingFee || 0;
   const total = order?.totalAmount || 0;
 
+  if (!order) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#fffaf4] px-5 font-sans">
+        <div className="text-center">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#a05f38]">
+            Order not found
+          </p>
+
+          <h1 className="mt-3 text-3xl font-semibold text-[#3a1407]">
+            We couldn't find this order.
+          </h1>
+
+          <p className="mt-3 text-sm text-[#817168]">
+            Please check your orders to view your recent purchases.
+          </p>
+
+          <Link
+            to="/orders"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#3a1407] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#54200f]">
+            View My Orders
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#fffaf4] font-sans text-[#3a1407]">
       {/* TOP CONFIRMATION */}

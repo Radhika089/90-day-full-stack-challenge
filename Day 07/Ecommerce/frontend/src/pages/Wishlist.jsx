@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { getWishlist, removeFromWishlist } from "../api/wishlistApi";
 import { addToCart } from "../api/cartApi";
+import toast from "react-hot-toast";
 
 const Wishlist = () => {
   const { user } = useContext(AuthContext);
@@ -25,6 +26,7 @@ const Wishlist = () => {
         setWishlistProducts(data.wishlist?.products || []);
       } catch (error) {
         console.log("Wishlist error:", error);
+        toast.error("Failed to load wishlist");
         setWishlistProducts([]);
       } finally {
         setLoading(false);
@@ -41,22 +43,29 @@ const Wishlist = () => {
       setWishlistProducts((prev) =>
         prev.filter((item) => item._id !== productId),
       );
+      toast.success("Removed from wishlist");
     } catch (error) {
       console.log("Remove wishlist error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to remove from wishlist",
+      );
     }
   };
 
   const handleAddToCart = async (productId) => {
     if (!user) {
-      console.log("Please login to add products to cart");
+      toast.error("Please login to add products to cart");
       return;
     }
 
     try {
       await addToCart(productId, 1);
-      console.log("Product added to cart");
+      toast.success("Product added to cart");
     } catch (error) {
       console.log("Add to cart error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to add product to cart",
+      );
     }
   };
 

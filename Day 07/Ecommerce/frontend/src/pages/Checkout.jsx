@@ -18,6 +18,7 @@ import {
   createRazorpayOrder,
   verifyPayment,
 } from "../api/orderApi";
+import toast from "react-hot-toast";
 
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -66,7 +67,7 @@ const Checkout = () => {
     );
 
     if (missingField) {
-      console.log("Please fill in all required fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -80,77 +81,86 @@ const Checkout = () => {
       pincode: formData.zip,
     };
 
-    const data = await createOrder(shippingAddress, paymentMethod);
+    try {
+      const data = await createOrder(shippingAddress, paymentMethod);
 
-    if (paymentMethod === "cod") {
-      console.log("COD order created", data);
+      if (paymentMethod === "cod") {
+        toast.success("Order placed successfully!");
 
-      navigate("/order-success", {
-        state: { order: data.order },
-      });
+        navigate("/order-success", {
+          state: { order: data.order },
+        });
 
-      return;
-    }
+        return;
+      }
 
-    console.log("AURA order created:", data);
+      const razorpayData = await createRazorpayOrder(data.order._id);
 
-    const razorpayData = await createRazorpayOrder(data.order._id);
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpayData.razorpayOrder.amount,
+        currency: razorpayData.razorpayOrder.currency,
+        name: "AURA Coffee Co.",
+        description: "AURA Coffee Order",
+        order_id: razorpayData.razorpayOrder.id,
 
-    console.log("Razorpay order created:", razorpayData);
-    console.log("Razorpay Key:", import.meta.env.VITE_RAZORPAY_KEY_ID);
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: razorpayData.razorpayOrder.amount,
-      currency: razorpayData.razorpayOrder.currency,
-      name: "AURA Coffee Co.",
-      description: "AURA Coffee Order",
-      order_id: razorpayData.razorpayOrder.id,
+        prefill: {
+          name: shippingAddress.name,
+          email: shippingAddress.email,
+          contact: shippingAddress.phone,
+        },
 
-      prefill: {
-        name: shippingAddress.name,
-        email: shippingAddress.email,
-        contact: shippingAddress.phone,
-      },
-
-      handler: async (response) => {
-        try {
-          console.log("Razorpay payment response:", response);
-
-          const verificationData = await verifyPayment({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-          });
-
-          console.log("Payment verification:", verificationData);
-
-          if (verificationData.success) {
-            navigate("/order-success", {
-              state: { order: verificationData.order },
+        handler: async (response) => {
+          try {
+            const verificationData = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
             });
+
+            if (verificationData.success) {
+              toast.success("Payment successful!");
+
+              navigate("/order-success", {
+                state: { order: verificationData.order },
+              });
+            } else {
+              toast.error(
+                verificationData.message || "Payment verification failed",
+              );
+            }
+          } catch (error) {
+            console.error("Payment verification failed:", error);
+
+            toast.error(
+              error.response?.data?.message ||
+                "Payment verification failed. Please contact support.",
+            );
           }
-        } catch (error) {
-          console.error("Payment verification failed:", error);
-        }
-      },
-    };
+        },
 
-    const razorpay = new window.Razorpay(options);
+        modal: {
+          ondismiss: () => {
+            toast.error("Payment cancelled");
+          },
+        },
+      };
 
-    razorpay.open();
+      const razorpay = new window.Razorpay(options);
 
-    console.log("Checkout data:", {
-      ...formData,
-      country,
-      paymentMethod,
-      cartItems,
-      total,
-    });
+      razorpay.open();
+    } catch (error) {
+      console.error("Checkout error:", error);
+
+      toast.error(
+        error.response?.data?.message || "Unable to place your order",
+      );
+    }
   };
 
   useEffect(() => {
     if (!user) {
-      console.log("Please login to continue");
+      toast.error("Please login to continue");
       setLoading(false);
       return;
     }
@@ -159,11 +169,12 @@ const Checkout = () => {
       try {
         const data = await getCart();
 
-        console.log("Checkout cart:", data);
-
         setCartItems(data.cart.items);
       } catch (error) {
         console.error("Failed to fetch cart:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to load your cart",
+        );
       } finally {
         setLoading(false);
       }
@@ -178,6 +189,7 @@ const Checkout = () => {
       setCartItems(data.cart.items);
     } catch (error) {
       console.error("Failed to update quantity:", error);
+      toast.error(error.response?.data?.message || "Failed to update quantity");
     }
   };
 
@@ -187,6 +199,9 @@ const Checkout = () => {
       setCartItems(data.cart.items);
     } catch (error) {
       console.error("Failed to remove item from the cart:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to remove item from the cart",
+      );
     }
   };
 
