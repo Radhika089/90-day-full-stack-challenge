@@ -231,6 +231,16 @@ const Navbar = () => {
 
                       <button
                         type="button"
+                        onClick={() => {
+                          setProfileOpen(false);
+                          navigate("/orders");
+                        }}
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm text-[#5c3929] transition hover:bg-[#f3e5d3]">
+                        My Orders
+                      </button>
+
+                      <button
+                        type="button"
                         onClick={handleLogout}
                         className="w-full rounded-lg px-3 py-2 text-left text-sm text-[#9a4f28] transition hover:bg-[#f3e5d3]">
                         Logout
@@ -344,6 +354,19 @@ const Navbar = () => {
                   <User size={18} />
                   Account
                 </Link>
+              )}
+
+              {user && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobileMenu();
+                    navigate("/orders");
+                  }}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-[#5c3929] hover:bg-[#f3e5d3]">
+                  <ShoppingBag size={18} />
+                  My Orders
+                </button>
               )}
 
               {user && (

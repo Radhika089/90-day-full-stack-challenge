@@ -13,6 +13,8 @@ import MainLayout from "./layout/MainLayout";
 import Wishlist from "./pages/Wishlist";
 import ScrollToTop from "./components/ScrollToTop";
 import Profile from "./pages/Profile";
+import MyOrders from "./pages/MyOrders";
+import OrderDetails from "./pages/OrderDetails";
 
 const App = () => {
   return (
@@ -33,6 +35,8 @@ const App = () => {
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/orders" element={<MyOrders />} />
+          <Route path="/orders/:orderId" element={<OrderDetails />} />
         </Route>
       </Routes>
     </>

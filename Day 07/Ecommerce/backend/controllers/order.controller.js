@@ -195,20 +195,18 @@ export async function cancelOrder(req, res) {
       });
     }
 
-    if (order.paymentStatus === "paid") {
-      for (const item of order.items) {
-        const product = await productModel.findById(item.product);
+    for (const item of order.items) {
+      const product = await productModel.findById(item.product);
 
-        if (!product) {
-          return res.status(404).json({
-            success: false,
-            message: "Product not found.",
-          });
-        }
-
-        product.stock += item.quantity;
-        await product.save();
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found.",
+        });
       }
+
+      product.stock += item.quantity;
+      await product.save();
     }
 
     order.orderStatus = "cancelled";
