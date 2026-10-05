@@ -6,6 +6,8 @@ export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cartUpdated, setCartUpdated] = useState(0);
+  const [wishlistUpdated, setWishlistUpdated] = useState(0);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -35,8 +37,26 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshCart = () => {
+    setCartUpdated((prev) => prev + 1);
+  };
+
+  const refreshWishlist = () => {
+    setWishlistUpdated((prev) => prev + 1);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, refreshUser, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        refreshUser,
+        logout,
+        cartUpdated,
+        refreshCart,
+        wishlistUpdated,
+        refreshWishlist,
+      }}>
       {children}
     </AuthContext.Provider>
   );

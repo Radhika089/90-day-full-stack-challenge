@@ -22,7 +22,7 @@ import Product from "../components/Product";
 import toast from "react-hot-toast";
 
 const ProductDetails = () => {
-  const { user } = useContext(AuthContext);
+  const { user, refreshCart } = useContext(AuthContext);
   const { productId } = useParams();
   const navigate = useNavigate();
 
@@ -79,6 +79,7 @@ const ProductDetails = () => {
 
     try {
       await addToCart(product._id, quantity);
+      refreshCart();
 
       toast.success("Product added to cart");
     } catch (error) {

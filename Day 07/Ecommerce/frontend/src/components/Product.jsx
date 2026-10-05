@@ -1,16 +1,17 @@
 import { Heart, ShoppingBag, Star } from "lucide-react";
 import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { addToCart } from "../api/cartApi";
+import { addToCart, getCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
 import {
   addToWishlist,
   getWishlist,
   removeFromWishlist,
 } from "../api/wishlistApi";
+import toast from "react-hot-toast";
 
 const Product = ({ product }) => {
-  const { user } = useContext(AuthContext);
+  const { user, refreshCart, refreshWishlist } = useContext(AuthContext);
   const [isWishListed, setIsWishListed] = useState(false);
 
   useEffect(() => {
@@ -38,22 +39,38 @@ const Product = ({ product }) => {
 
   const handleAddToCart = async () => {
     if (!user) {
-      console.log("Please login to add products to cart");
+      toast.error("Please login to add products to cart");
       return;
     }
 
     try {
-      const data = await addToCart(product._id, 1);
+      const data = await getCart();
 
-      console.log(data);
+      const existingItem = data.cart.items.find(
+        (item) => item.product._id === product._id,
+      );
+
+      if (existingItem) {
+        toast.error("Product is already in your cart");
+        return;
+      }
+
+      await addToCart(product._id, 1);
+      refreshCart();
+
+      toast.success("Product added to cart");
     } catch (error) {
       console.error("Failed to add product to cart:", error);
+
+      toast.error(
+        error.response?.data?.message || "Failed to add product to cart",
+      );
     }
   };
 
   const handleAddToWishlist = async () => {
     if (!user) {
-      console.log("Please login to add products to wishlist");
+      toast.error("Please login to add products to wishlist");
       return;
     }
 
@@ -61,14 +78,18 @@ const Product = ({ product }) => {
       if (isWishListed) {
         await removeFromWishlist(product._id);
         setIsWishListed(false);
-        console.log("Product removed from wishlist");
+        refreshWishlist();
+        toast.success("Removed from wishlist");
       } else {
         await addToWishlist(product._id);
         setIsWishListed(true);
-        console.log("Product added to wishlist");
+        refreshWishlist();
+        toast.success("Added to wishlist");
       }
     } catch (error) {
       console.log("Wishlist error:", error.response?.data);
+
+      toast.error(error.response?.data?.message || "Failed to update wishlist");
     }
   };
 

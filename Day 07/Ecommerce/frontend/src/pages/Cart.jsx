@@ -17,7 +17,7 @@ import Swal from "sweetalert2";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
-  const { user } = useContext(AuthContext);
+  const { user, cartUpdated } = useContext(AuthContext);
 
   useEffect(() => {
     if (!user) {
@@ -38,7 +38,7 @@ const Cart = () => {
       }
     };
     fetchCart();
-  }, [user]);
+  }, [user, cartUpdated]);
 
   const handleUpdateQuantity = async (productId, newQuantity) => {
     try {

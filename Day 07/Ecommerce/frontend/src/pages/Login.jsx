@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -10,8 +10,11 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../api/authApi";
 import toast from "react-hot-toast";
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
+  const { refreshUser } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -31,6 +34,7 @@ const Login = () => {
       });
 
       if (data.success) {
+        await refreshUser();
         toast.success("Welcome Back!");
         navigate("/");
       }

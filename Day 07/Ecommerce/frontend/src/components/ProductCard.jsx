@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
 import { getProducts } from "../api/productApi";
+import toast from "react-hot-toast";
 
 const ProductCard = () => {
   const [products, setProducts] = useState([]);
@@ -16,6 +17,7 @@ const ProductCard = () => {
         setProducts(data.products);
       } catch (error) {
         console.error("Failed to fetch products:", error);
+        toast.error("Failed to load products");
       }
     };
     fetchProducts();

@@ -12,9 +12,11 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { getCart, updateCart, removeFromCart } from "../api/cartApi";
 import { AuthContext } from "../context/AuthContext";
 import { getWishlist } from "../api/wishlistApi";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const { user, loading, logout } = useContext(AuthContext);
+  const { user, loading, logout, cartUpdated, wishlistUpdated } =
+    useContext(AuthContext);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const navigate = useNavigate();
@@ -37,17 +39,30 @@ const Navbar = () => {
   }, [search]);
 
   useEffect(() => {
+    if (loading) return;
+
+    if (!user) {
+      setCart(null);
+      return;
+    }
+
     const fetchCart = async () => {
       try {
         const data = await getCart();
+        console.log("NAVBAR CART:", data.cart);
+
         setCart(data.cart);
       } catch (error) {
         console.error("Failed to fetch cart:", error);
+
+        toast.error(
+          error.response?.data?.message || "Failed to load your cart",
+        );
       }
     };
 
     fetchCart();
-  }, []);
+  }, [user, loading, cartUpdated]);
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -62,11 +77,15 @@ const Navbar = () => {
       } catch (error) {
         console.log("Failed to fetch wishlist:", error);
         setWishlist(null);
+
+        toast.error(
+          error.response?.data?.message || "Failed to load your wishlist",
+        );
       }
     };
 
     fetchWishlist();
-  }, [user]);
+  }, [user, wishlistUpdated]);
 
   const handleUpdateQuantity = async (productId, newQuantity) => {
     try {
@@ -74,6 +93,8 @@ const Navbar = () => {
       setCart(data.cart);
     } catch (error) {
       console.error("Failed to update cart:", error);
+
+      toast.error(error.response?.data?.message || "Failed to update cart");
     }
   };
 
@@ -83,13 +104,26 @@ const Navbar = () => {
       setCart(data.cart);
     } catch (error) {
       console.error("Failed to remove item from cart:", error);
+
+      toast.error(
+        error.response?.data?.message || "Failed to remove item from cart",
+      );
     }
   };
 
   const handleLogout = async () => {
-    await logout();
-    setProfileOpen(false);
-    navigate("/");
+    try {
+      await logout();
+
+      setProfileOpen(false);
+      navigate("/");
+
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      toast.error("Logout failed");
+    }
   };
 
   const handleSearch = (e) => {

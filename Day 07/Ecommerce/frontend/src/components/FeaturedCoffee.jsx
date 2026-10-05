@@ -1,10 +1,14 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { getProducts } from "../api/productApi";
 import { useState } from "react";
 import Skelton from "./Skelton";
 import { addToCart } from "../api/cartApi";
+import toast from "react-hot-toast";
+import { AuthContext } from "../context/AuthContext";
 
 const FeaturedCoffee = () => {
+  const { user } = useContext(AuthContext);
+
   const [products, setProducts] = useState([]);
   const [filter, setFilter] = useState(null);
 
@@ -36,10 +40,21 @@ const FeaturedCoffee = () => {
   const product = filteredProducts[0];
 
   const handleAddToCart = async () => {
+    if (!user) {
+      toast.error("Please login to add products to cart");
+      return;
+    }
+
     try {
       await addToCart(product._id, 1);
+
+      toast.success("Product added to cart");
     } catch (error) {
       console.error("Failed to add in cart:", error);
+
+      toast.error(
+        error.response?.data?.message || "Failed to add product to cart",
+      );
     }
   };
 

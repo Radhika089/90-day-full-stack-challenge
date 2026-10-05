@@ -1,4 +1,3 @@
-import React from "react";
 import { Coffee, Leaf, PackageCheck, Sparkles } from "lucide-react";
 
 const WhyChooseUs = () => {
