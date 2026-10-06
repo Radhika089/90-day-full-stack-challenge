@@ -55,6 +55,11 @@ const Navbar = () => {
       } catch (error) {
         console.error("Failed to fetch cart:", error);
 
+        if (error.response?.status === 404) {
+          setCart({ items: [] });
+          return;
+        }
+
         toast.error(
           error.response?.data?.message || "Failed to load your cart",
         );
@@ -76,6 +81,12 @@ const Navbar = () => {
         setWishlist(data.wishlist);
       } catch (error) {
         console.log("Failed to fetch wishlist:", error);
+
+        if (error.response?.status === 404) {
+          setWishlist({ products: [] });
+          return;
+        }
+
         setWishlist(null);
 
         toast.error(
@@ -151,6 +162,7 @@ const Navbar = () => {
     { name: "Shop", path: "/shop" },
     { name: "Brews", path: "/brews" },
     { name: "Gear", path: "/gear" },
+    { name: "Accessories", path: "/accessories" },
     { name: "About", path: "/about" },
     { name: "Subscribe", path: "/subscribe" },
   ];

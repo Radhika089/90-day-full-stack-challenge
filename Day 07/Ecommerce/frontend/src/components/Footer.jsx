@@ -4,12 +4,13 @@ import {
   FaLinkedinIn,
   FaArrowRight,
 } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden bg-[#f5eee2] text-[#432519]">
       {/* Footer */}
-      <div className="relative mt-[35px] bg-[#f5eee2] ">
+      <div className="relative mt-[35px] bg-[#f5eee2]">
         <div className="relative z-20 mx-auto max-w-7xl px-6 pb-[150px] pt-[45px] sm:px-10 lg:px-16">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
             {/* Brand */}
@@ -36,6 +37,7 @@ export default function Footer() {
                 moments, and everyday rituals.
               </p>
 
+              {/* Social Links */}
               <div className="mt-6 flex gap-2.5">
                 <a
                   href="#"
@@ -68,35 +70,35 @@ export default function Footer() {
 
               <ul className="space-y-3 text-[13px] text-[#765847]">
                 <li>
-                  <a
-                    href="#shop"
+                  <Link
+                    to="/shop"
                     className="transition-colors hover:text-[#a96f42]">
                     All Coffee
-                  </a>
+                  </Link>
                 </li>
 
                 <li>
-                  <a
-                    href="#bestsellers"
+                  <Link
+                    to="/shop"
                     className="transition-colors hover:text-[#a96f42]">
                     Bestsellers
-                  </a>
+                  </Link>
                 </li>
 
                 <li>
-                  <a
-                    href="#collections"
+                  <Link
+                    to="/shop"
                     className="transition-colors hover:text-[#a96f42]">
                     Collections
-                  </a>
+                  </Link>
                 </li>
 
                 <li>
-                  <a
-                    href="#new"
+                  <Link
+                    to="/shop"
                     className="transition-colors hover:text-[#a96f42]">
                     New Arrivals
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -109,35 +111,59 @@ export default function Footer() {
 
               <ul className="space-y-3 text-[13px] text-[#765847]">
                 <li>
-                  <a
-                    href="#home"
+                  <Link
+                    to="/"
                     className="transition-colors hover:text-[#a96f42]">
                     Home
-                  </a>
+                  </Link>
                 </li>
 
                 <li>
-                  <a
-                    href="#shop"
+                  <Link
+                    to="/shop"
                     className="transition-colors hover:text-[#a96f42]">
                     Shop
-                  </a>
+                  </Link>
                 </li>
 
                 <li>
-                  <a
-                    href="#featured"
+                  <Link
+                    to="/brews"
                     className="transition-colors hover:text-[#a96f42]">
-                    Featured
-                  </a>
+                    Brews
+                  </Link>
                 </li>
 
                 <li>
-                  <a
-                    href="#newsletter"
+                  <Link
+                    to="/gear"
                     className="transition-colors hover:text-[#a96f42]">
-                    Newsletter
-                  </a>
+                    Gear
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/accessories"
+                    className="transition-colors hover:text-[#a96f42]">
+                    Accessories
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/about"
+                    className="transition-colors hover:text-[#a96f42]">
+                    About
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/subscribe"
+                    className="transition-colors hover:text-[#a96f42]">
+                    Subscribe
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -170,31 +196,37 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Divider */}
           <div className="mt-12 border-t border-[#d8c6aa]" />
 
+          {/* Bottom Footer */}
           <div className="flex flex-col gap-3 pt-5 text-[10px] tracking-wide text-[#8b6d57] sm:flex-row sm:items-center sm:justify-between">
             <p>
               © {new Date().getFullYear()} Aura Coffee. All rights reserved.
             </p>
 
             <div className="flex gap-5">
-              <a href="#" className="transition-colors hover:text-[#5a3523]">
+              <Link
+                to="/privacy"
+                className="transition-colors hover:text-[#5a3523]">
                 Privacy
-              </a>
+              </Link>
 
-              <a href="#" className="transition-colors hover:text-[#5a3523]">
+              <Link
+                to="/terms"
+                className="transition-colors hover:text-[#5a3523]">
                 Terms
-              </a>
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Coffee beans */}
+        {/* Coffee Beans */}
         <div className="absolute bottom-0 left-0 z-10 w-full overflow-hidden">
           <img
             src="/coffee-beans-pile.png"
             alt=""
-            className="block w-full max-w-none h-auto object-cover object-bottom [image-rendering:auto] "
+            className="block h-auto w-full max-w-none object-cover object-bottom [image-rendering:auto]"
           />
         </div>
       </div>

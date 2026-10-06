@@ -17,7 +17,7 @@ import Swal from "sweetalert2";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
-  const { user, cartUpdated } = useContext(AuthContext);
+  const { user, cartUpdated, refreshCart } = useContext(AuthContext);
 
   useEffect(() => {
     if (!user) {
@@ -87,6 +87,8 @@ const Cart = () => {
 
     try {
       const data = await clearCart();
+      refreshCart();
+
       setCart(data.cart);
 
       toast.success("Cart cleared successfully");

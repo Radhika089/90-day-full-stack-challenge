@@ -15,6 +15,9 @@ import ScrollToTop from "./components/ScrollToTop";
 import Profile from "./pages/Profile";
 import MyOrders from "./pages/MyOrders";
 import OrderDetails from "./pages/OrderDetails";
+import Accessories from "./pages/Accessories";
+import About from "./pages/About";
+import Subscribe from "./pages/Subscribe";
 
 const App = () => {
   return (
@@ -29,6 +32,7 @@ const App = () => {
           <Route path="/shop" element={<Shop />} />
           <Route path="/brews" element={<Brews />} />
           <Route path="/gear" element={<Gear />} />
+          <Route path="/accessories" element={<Accessories />} />
           <Route path="/products/:productId" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -37,6 +41,8 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/orders" element={<MyOrders />} />
           <Route path="/orders/:orderId" element={<OrderDetails />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/subscribe" element={<Subscribe />} />
         </Route>
       </Routes>
     </>

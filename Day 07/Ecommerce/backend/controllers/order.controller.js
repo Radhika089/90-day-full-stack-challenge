@@ -212,6 +212,8 @@ export async function cancelOrder(req, res) {
     order.orderStatus = "cancelled";
     await order.save();
 
+    await order.populate("items.product");
+
     return res.status(200).json({
       success: true,
       message: "Order cancelled successfully",

@@ -44,9 +44,23 @@ const Checkout = () => {
   const handleChange = (e) => {
     const { id, value } = e.target;
 
+    let newValue = value;
+
+    if (id === "firstName" || id === "lastName" || id === "city") {
+      newValue = value.replace(/[^a-zA-Z\s]/g, "");
+    }
+
+    if (id === "phone") {
+      newValue = value.replace(/\D/g, "").slice(0, 10);
+    }
+
+    if (id === "zip") {
+      newValue = value.replace(/\D/g, "").slice(0, 6);
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [id]: value,
+      [id]: newValue,
     }));
   };
 
@@ -68,6 +82,41 @@ const Checkout = () => {
 
     if (missingField) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.phone)) {
+      toast.error("Phone number must be 10 digits");
+      return;
+    }
+
+    if (!/^[a-zA-Z\s]+$/.test(formData.firstName)) {
+      toast.error("First name can contain letters only");
+      return;
+    }
+
+    if (!/^[a-zA-Z\s]+$/.test(formData.lastName)) {
+      toast.error("Last name can contain letters only");
+      return;
+    }
+
+    if (!/^[a-zA-Z\s]+$/.test(formData.city)) {
+      toast.error("City can contain letters only");
+      return;
+    }
+
+    if (!/^[a-zA-Z\s]+$/.test(formData.state)) {
+      toast.error("State can contain letters only");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(formData.zip)) {
+      toast.error("PIN code must be 6 digits");
       return;
     }
 
@@ -356,7 +405,7 @@ const Checkout = () => {
                   type="tel"
                   onChange={handleChange}
                   value={formData.phone}
-                  placeholder="+91 98765 43210"
+                  placeholder="98765 43210"
                   className="h-11 w-full rounded-[8px] border border-[#ded2c5] bg-[#faf6f0] px-3 text-xs text-[#3a1407] outline-none transition-colors placeholder:text-[#b2a69d] focus:border-[#a05f38]"
                 />
               </div>
