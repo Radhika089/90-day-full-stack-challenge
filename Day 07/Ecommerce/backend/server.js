@@ -8,6 +8,8 @@ import cartRouter from "./routes/cart.routes.js";
 import wishlistRouter from "./routes/wishlist.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import reviewRouter from "./routes/review.route.js";
+import categoryRouter from "./routes/category.routes.js";
+
 import cors from "cors";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -37,6 +39,7 @@ app.use("/api/cart", cartRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/review", reviewRouter);
+app.use("/api/categories", categoryRouter);
 
 const port = process.env.PORT || 3000;
 

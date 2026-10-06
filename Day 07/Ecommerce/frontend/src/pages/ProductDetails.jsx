@@ -134,7 +134,8 @@ const ProductDetails = () => {
     ? products
         .filter(
           (item) =>
-            item.category === product.category && item._id !== product._id,
+            item.category?._id === product.category?._id &&
+            item._id !== product._id,
         )
         .slice(0, 4)
     : [];
@@ -217,7 +218,7 @@ const ProductDetails = () => {
             {/* RIGHT - PRODUCT INFORMATION */}
             <div className="flex flex-col justify-center">
               <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#a05f38]">
-                {product.category}
+                {product.category?.name}
               </p>
 
               <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-[-0.025em] text-[#3a1407] sm:text-5xl">

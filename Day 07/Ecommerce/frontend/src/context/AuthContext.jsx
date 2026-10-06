@@ -17,8 +17,11 @@ const AuthProvider = ({ children }) => {
         setUser(data.user);
       }
     } catch (error) {
-      console.log(error);
-      setUser(null);
+      if (error.response?.status === 401 || error.response?.status === 400) {
+        setUser(null);
+      } else {
+        console.error(error);
+      }
     } finally {
       setLoading(false);
     }

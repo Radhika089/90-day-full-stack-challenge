@@ -1,4 +1,5 @@
 import productModel from "../models/product.js";
+import categoryModel from "../models/category.js";
 
 export async function createProduct(req, res) {
   const {
@@ -28,6 +29,15 @@ export async function createProduct(req, res) {
   }
 
   try {
+    const categoryExists = await categoryModel.findById(category);
+
+    if (!categoryExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found!",
+      });
+    }
+
     const existingProduct = await productModel.findOne({ name, brand });
 
     if (existingProduct) {
@@ -71,20 +81,30 @@ export async function getAllProducts(req, res) {
     let query = { isActive: true };
 
     if (search) {
+      const matchingCategories = await categoryModel
+        .find({
+          name: { $regex: search, $options: "i" },
+        })
+        .select("_id");
+
+      const categoryIds = matchingCategories.map((category) => category._id);
+
       query.$or = [
         {
           name: { $regex: search, $options: "i" },
         },
         {
-          category: { $regex: search, $options: "i" },
+          brand: { $regex: search, $options: "i" },
         },
         {
-          brand: { $regex: search, $options: "i" },
+          category: { $in: categoryIds },
         },
       ];
     }
 
-    const products = await productModel.find(query);
+    const products = await productModel
+      .find(query)
+      .populate("category", "name slug description isActive");
     res.status(200).json({
       success: true,
       count: products.length,
@@ -101,7 +121,9 @@ export async function getAllProducts(req, res) {
 
 export async function getSingleProduct(req, res) {
   try {
-    const product = await productModel.findById(req.params.id);
+    const product = await productModel
+      .findById(req.params.id)
+      .populate("category", "name slug description isActive");
 
     if (!product) {
       return res.status(404).json({
@@ -128,6 +150,17 @@ export async function updateProduct(req, res) {
 
     if (req.file) {
       updateData.image = req.file.path;
+    }
+
+    if (updateData.category) {
+      const categoryExists = await categoryModel.findById(updateData.category);
+
+      if (!categoryExists) {
+        return res.status(404).json({
+          success: false,
+          message: "Category not found!",
+        });
+      }
     }
 
     const product = await productModel.findByIdAndUpdate(

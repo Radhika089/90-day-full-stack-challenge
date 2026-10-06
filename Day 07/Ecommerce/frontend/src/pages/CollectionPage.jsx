@@ -47,7 +47,7 @@ const CollectionPage = ({
       return products;
     }
 
-    return products.filter((product) => product.category === category);
+    return products.filter((product) => product.category?.slug === category);
   }, [category, products]);
 
   const filteredProducts = useMemo(() => {
@@ -55,7 +55,7 @@ const CollectionPage = ({
 
     if (category === "all" && selectedCategory !== "all") {
       result = result.filter(
-        (product) => product.category === selectedCategory,
+        (product) => product.category?.slug === selectedCategory,
       );
     }
 
@@ -273,7 +273,7 @@ const CollectionPage = ({
                       value={selectedCategory}
                       onChange={(e) => handleCategoryChange(e.target.value)}
                       className="appearance-none rounded-full border border-[#ddcbb7] bg-[#fffaf2] py-2.5 pl-4 pr-9 text-xs font-medium text-[#5c3929] outline-none">
-                      {categories.map((item) => (
+                      {visibleCategories.map((item) => (
                         <option key={item.value} value={item.value}>
                           {item.label}
                         </option>

@@ -149,7 +149,7 @@ const Product = ({ product }) => {
           {/* Category + Rating */}
           <div className="flex items-center justify-between">
             <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-[#a05f38]">
-              {product.category}
+              {product.category?.name}
             </p>
 
             <div className="flex items-center gap-1">
