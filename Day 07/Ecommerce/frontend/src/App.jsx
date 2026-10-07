@@ -18,6 +18,8 @@ import OrderDetails from "./pages/OrderDetails";
 import Accessories from "./pages/Accessories";
 import About from "./pages/About";
 import Subscribe from "./pages/Subscribe";
+import AdminLayout from "./admin/AdminLayout";
+import Dashboard from "./admin/pages/Dashboard";
 
 const App = () => {
   return (
@@ -43,6 +45,12 @@ const App = () => {
           <Route path="/orders/:orderId" element={<OrderDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/subscribe" element={<Subscribe />} />
+        </Route>
+
+        {/* Admin */}
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
     </>
