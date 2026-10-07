@@ -20,6 +20,7 @@ import About from "./pages/About";
 import Subscribe from "./pages/Subscribe";
 import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/pages/Dashboard";
+import Products from "./admin/pages/Products";
 
 const App = () => {
   return (
@@ -52,6 +53,7 @@ const App = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="products" element={<Products />} />
         </Route>
       </Routes>
     </>

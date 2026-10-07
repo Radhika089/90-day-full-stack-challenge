@@ -76,9 +76,14 @@ export async function createProduct(req, res) {
 
 export async function getAllProducts(req, res) {
   try {
-    const { search } = req.query;
+    const { search, admin } = req.query;
 
-    let query = { isActive: true };
+    let query = {};
+
+    // Customer side should only see active products
+    if (admin !== "true") {
+      query.isActive = true;
+    }
 
     if (search) {
       const matchingCategories = await categoryModel
@@ -104,7 +109,9 @@ export async function getAllProducts(req, res) {
 
     const products = await productModel
       .find(query)
-      .populate("category", "name slug description isActive");
+      .populate("category", "name slug description isActive")
+      .sort({ createdAt: -1 });
+
     res.status(200).json({
       success: true,
       count: products.length,
@@ -118,7 +125,6 @@ export async function getAllProducts(req, res) {
     });
   }
 }
-
 export async function getSingleProduct(req, res) {
   try {
     const product = await productModel
