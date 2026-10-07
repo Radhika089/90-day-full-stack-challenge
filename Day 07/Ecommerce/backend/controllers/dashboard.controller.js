@@ -1,63 +1,56 @@
 import userModel from "../models/user.js";
-import productModel from "../models/product.js";
 import orderModel from "../models/order.js";
+import productModel from "../models/product.js";
 
 export async function getDashboard(req, res) {
   try {
-    const [
-      totalCustomers,
-      totalProducts,
-      totalOrders,
-      revenueResult,
-      pendingOrders,
-      lowStockProducts,
-      outOfStockProducts,
-      recentOrders,
-    ] = await Promise.all([
-      userModel.countDocuments({ role: "user" }),
+    const totalCustomers = await userModel.countDocuments({
+      role: "user",
+    });
 
-      productModel.countDocuments({ isActive: true }),
+    const totalProducts = await productModel.countDocuments({
+      isActive: true,
+    });
 
-      orderModel.countDocuments(),
+    const totalOrders = await orderModel.countDocuments();
 
-      orderModel.aggregate([
-        {
-          $match: {
-            orderStatus: { $ne: "cancelled" },
-            paymentStatus: { $in: ["paid", "pending"] },
-          },
+    const revenueResult = await orderModel.aggregate([
+      {
+        $match: {
+          orderStatus: { $ne: "cancelled" },
+          paymentStatus: { $in: ["paid", "pending"] },
         },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: "$totalAmount" },
-          },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalAmount" },
         },
-      ]),
-
-      orderModel.countDocuments({
-        orderStatus: { $in: ["pending", "processing"] },
-      }),
-
-      productModel.countDocuments({
-        isActive: true,
-        stock: { $gt: 0, $lte: 5 },
-      }),
-
-      productModel.countDocuments({
-        isActive: true,
-        stock: 0,
-      }),
-
-      orderModel
-        .find()
-        .populate("user", "name email")
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .select(
-          "user totalAmount paymentStatus paymentMethod orderStatus createdAt",
-        ),
+      },
     ]);
+
+    const pendingOrders = await orderModel.countDocuments({
+      orderStatus: { $in: ["pending", "processing"] },
+    });
+
+    const lowStockProducts = await productModel.countDocuments({
+      isActive: true,
+      stock: { $gt: 0, $lte: 5 },
+    });
+
+    const outOfStockProducts = await productModel.countDocuments({
+      isActive: true,
+      stock: 0,
+    });
+
+    const recentOrders = await orderModel
+      .find()
+      .populate("user", "name email")
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select(
+        "user totalAmount paymentStatus paymentMethod orderStatus createdAt",
+      );
 
     const totalRevenue = revenueResult[0]?.total || 0;
 
