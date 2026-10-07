@@ -9,6 +9,9 @@ import wishlistRouter from "./routes/wishlist.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import reviewRouter from "./routes/review.route.js";
 import categoryRouter from "./routes/category.routes.js";
+import inventoryRouter from "./routes/inventory.routes.js";
+import dashboardRouter from "./routes/dashboard.routes.js";
+import customerRouter from "./routes/customer.routes.js";
 
 import cors from "cors";
 
@@ -40,6 +43,9 @@ app.use("/api/wishlist", wishlistRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/categories", categoryRouter);
+app.use("/api/inventory", inventoryRouter);
+app.use("/api/admin/dashboard", dashboardRouter);
+app.use("/api/admin/customers", customerRouter);
 
 const port = process.env.PORT || 3000;
 
