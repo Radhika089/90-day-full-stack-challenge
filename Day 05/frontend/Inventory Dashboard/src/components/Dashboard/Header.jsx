@@ -1,5 +1,4 @@
 import { Bell, Mail, Search, User2 } from "lucide-react";
-import React from "react";
 
 const Header = () => {
   return (

@@ -50,6 +50,7 @@ const App = () => {
         {/* Admin */}
 
         <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
