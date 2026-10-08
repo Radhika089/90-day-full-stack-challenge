@@ -13,7 +13,7 @@ const ProductAdd = () => {
           <button
             type="button"
             onClick={() => navigate("/admin/products")}
-            className="mb-3 flex items-center gap-2 text-sm text-gray-500 transition hover:text-[#315C4A]">
+            className="mb-3 flex items-center gap-2 text-sm cursor-pointer text-gray-500 transition hover:text-[#315C4A]">
             <ArrowLeft size={16} />
             Back to Products
           </button>

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const ProductHeader = () => {
   return (
     <div className="mb-8 w-full">
@@ -15,9 +17,11 @@ const ProductHeader = () => {
 
         {/* Right */}
         <div>
-          <button className="rounded-xl bg-[#315C4A] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#284C3D]">
+          <Link
+            to={"/admin/products/add"}
+            className="rounded-xl bg-[#315C4A] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#284C3D]">
             + Add Product
-          </button>
+          </Link>
         </div>
       </div>
     </div>
