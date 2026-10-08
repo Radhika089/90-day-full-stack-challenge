@@ -21,6 +21,9 @@ import Subscribe from "./pages/Subscribe";
 import AdminLayout from "./admin/AdminLayout";
 import Dashboard from "./admin/pages/Dashboard";
 import Products from "./admin/pages/Products";
+import Sidebar from "./admin/Sidebar";
+import ProductAdd from "./admin/pages/ProductAdd";
+import ProductEdit from "./admin/pages/ProductEdit";
 
 const App = () => {
   return (
@@ -54,7 +57,11 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="products" element={<Products />} />
+          <Route path="products/add" element={<ProductAdd />} />
+          <Route path="products/:id/edit" element={<ProductEdit />} />
         </Route>
+
+        <Route path="/sidebar" element={<Sidebar />} />
       </Routes>
     </>
   );
