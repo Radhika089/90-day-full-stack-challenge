@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const ProductTable = ({ products, onStatusToggle }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,6 +22,40 @@ const ProductTable = ({ products, onStatusToggle }) => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const navigate = useNavigate();
+  const [openMenu, setOpenMenu] = useState();
+
+  const handleStatusChange = async (product) => {
+    const willActivate = !product.status;
+
+    const result = await Swal.fire({
+      title: willActivate ? "Activate product?" : "Deactivate product?",
+      text: willActivate
+        ? `Do you want to make ${product.name} available in your store?`
+        : `Do you want to make ${product.name} unavailable in your store?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: willActivate ? "Yes, activate" : "Yes, deactivate",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#315C4A",
+      cancelButtonColor: "#6B7280",
+      reverseButtons: true,
+    });
+
+    if (result.isConfirmed) {
+      onStatusToggle(product.id);
+
+      Swal.fire({
+        title: willActivate ? "Product activated!" : "Product deactivated!",
+        text: `${product.name} is now ${willActivate ? "active" : "inactive"}.`,
+        icon: "success",
+        confirmButtonColor: "#315C4A",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    }
   };
 
   return (
@@ -116,12 +158,15 @@ const ProductTable = ({ products, onStatusToggle }) => {
                 <td className="px-6 py-4">
                   <button
                     type="button"
-                    onClick={() => onStatusToggle(product.id)}
-                    className={`relative h-6 w-11 rounded-full transition-colors ${
+                    role="switch"
+                    aria-checked={product.status}
+                    aria-label={`Toggle ${product.name} status`}
+                    onClick={() => handleStatusChange(product)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#315C4A] focus-visible:ring-offset-2 ${
                       product.status ? "bg-[#315C4A]" : "bg-gray-300"
                     }`}>
                     <span
-                      className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition-transform duration-200 ${
                         product.status ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
@@ -130,11 +175,60 @@ const ProductTable = ({ products, onStatusToggle }) => {
 
                 {/* Action */}
                 <td className="px-6 py-4 text-right">
-                  <button
-                    type="button"
-                    className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700">
-                    <MoreHorizontal size={18} />
-                  </button>
+                  <div className="relative inline-block">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenMenu(openMenu === product.id ? null : product.id)
+                      }
+                      className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700">
+                      <MoreHorizontal size={18} />
+                    </button>
+
+                    {openMenu === product.id && (
+                      <div className="absolute right-0 top-10 z-20 w-36 rounded-xl border border-gray-200 bg-white p-1.5 text-left shadow-lg">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(`/admin/products/${product.id}/edit`)
+                          }
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition hover:bg-gray-50">
+                          <Pencil size={15} />
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const result = await Swal.fire({
+                              title: "Delete product?",
+                              text: `Are you sure you want to delete ${product.name}?`,
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonText: "Yes, delete it",
+                              cancelButtonText: "Cancel",
+                              confirmButtonColor: "#315C4A",
+                            });
+
+                            if (result.isConfirmed) {
+                              // Backend delete will be connected here
+                              Swal.fire({
+                                title: "Deleted!",
+                                text: `${product.name} has been deleted.`,
+                                icon: "success",
+                                confirmButtonColor: "#315C4A",
+                              });
+                            }
+
+                            setOpenMenu(null);
+                          }}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 transition hover:bg-red-50">
+                          <Trash2 size={15} />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
