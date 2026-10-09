@@ -29,6 +29,8 @@ import CategoryAdd from "./admin/pages/CategoryAdd";
 import CategoryEdit from "./admin/pages/CategoryEdit";
 import Inventory from "./admin/pages/Inventory";
 import Orders from "./admin/pages/Orders";
+import Customers from "./admin/pages/Customers";
+import Settings from "./admin/pages/Settings";
 
 const App = () => {
   return (
@@ -69,6 +71,8 @@ const App = () => {
           <Route path="categories/:id/edit" element={<CategoryEdit />} />
           <Route path="inventory" element={<Inventory />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         <Route path="/sidebar" element={<Sidebar />} />
