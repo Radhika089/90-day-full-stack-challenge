@@ -24,6 +24,9 @@ import Products from "./admin/pages/Products";
 import Sidebar from "./admin/Sidebar";
 import ProductAdd from "./admin/pages/ProductAdd";
 import ProductEdit from "./admin/pages/ProductEdit";
+import Categories from "./admin/pages/Categories";
+import CategoryAdd from "./admin/pages/CategoryAdd";
+import CategoryEdit from "./admin/pages/CategoryEdit";
 
 const App = () => {
   return (
@@ -59,6 +62,9 @@ const App = () => {
           <Route path="products" element={<Products />} />
           <Route path="products/add" element={<ProductAdd />} />
           <Route path="products/:id/edit" element={<ProductEdit />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="categories/add" element={<CategoryAdd />} />
+          <Route path="categories/:id/edit" element={<CategoryEdit />} />
         </Route>
 
         <Route path="/sidebar" element={<Sidebar />} />
