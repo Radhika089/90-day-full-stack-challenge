@@ -27,6 +27,7 @@ import ProductEdit from "./admin/pages/ProductEdit";
 import Categories from "./admin/pages/Categories";
 import CategoryAdd from "./admin/pages/CategoryAdd";
 import CategoryEdit from "./admin/pages/CategoryEdit";
+import Inventory from "./admin/pages/Inventory";
 
 const App = () => {
   return (
@@ -65,6 +66,7 @@ const App = () => {
           <Route path="categories" element={<Categories />} />
           <Route path="categories/add" element={<CategoryAdd />} />
           <Route path="categories/:id/edit" element={<CategoryEdit />} />
+          <Route path="inventory" element={<Inventory />} />
         </Route>
 
         <Route path="/sidebar" element={<Sidebar />} />
